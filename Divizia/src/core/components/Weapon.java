@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class Weapon {
     
-    private WeaponFamily weaponFamily;
     private WeaponType weaponType;
     private PropValue weaponBonus;
     
@@ -25,12 +24,11 @@ public class Weapon {
     
     private List<WeaponTalent> extraTalents;
     
-    public Weapon(WeaponFamily weaponFamily, WeaponType weaponType, Float baseDamage, WeaponTalent mainTalent) {
-        this(weaponFamily, weaponType, baseDamage, mainTalent, null);
+    public Weapon(WeaponType weaponType, Float baseDamage, WeaponTalent mainTalent) {
+        this(weaponType, baseDamage, mainTalent, null);
     }
     
-    public Weapon(WeaponFamily weaponFamily, WeaponType weaponType, Float baseDamage, WeaponTalent mainTalent, PropValue weaponBonus) {
-        this.weaponFamily = weaponFamily;
+    public Weapon(WeaponType weaponType, Float baseDamage, WeaponTalent mainTalent, PropValue weaponBonus) {
         this.weaponType = weaponType;
         this.baseDamage = baseDamage;
         this.mainTalent = mainTalent;
@@ -45,9 +43,6 @@ public class Weapon {
         this.extraTalents.add(talent);
     }
     
-    public WeaponFamily getWeaponFamily() {
-        return weaponFamily;
-    }
 
     public WeaponType getWeaponType() {
         return weaponType;

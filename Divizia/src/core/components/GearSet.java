@@ -6,6 +6,8 @@
 
 package core.components;
 
+import java.util.List;
+
 /**
  *
  * @author tchabole
@@ -17,6 +19,8 @@ public abstract class GearSet {
     public String getName() {
         return this.name;
     }
+    
+    public abstract List<PropValue> getSetBonus(int pieces);
     
     // Set bonuses ??
 }

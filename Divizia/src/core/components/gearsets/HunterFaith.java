@@ -9,6 +9,8 @@ package core.components.gearsets;
 import core.components.GearSet;
 import core.components.PropValue;
 import core.components.Property;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -27,15 +29,22 @@ public class HunterFaith extends GearSet{
     }
     
     //TODO: More complex bonuses 
-    public PropValue getSetBonus(int pieces) {
+    @Override
+    public List<PropValue> getSetBonus(int pieces) {
         
+        List<PropValue> ret = new ArrayList<PropValue>();
         switch (pieces) {
+            case 6:
+            case 5:
+            case 4:
+            case 3:
+                ret.add(new PropValue(Property.GEAR_HEADSHOT_DAMAGE, 20F));
             case 2:
-                return new PropValue(Property.GEAR_HEADSHOT_DAMAGE, 20F);
-                    
+                ret.add(new PropValue(Property.GEAR_OPTIMAL_RANGE, 20F));
+                break;
         }
         
-        return null;
+        return ret;
     }
     
 }

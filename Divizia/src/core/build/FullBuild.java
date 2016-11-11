@@ -7,6 +7,7 @@
 package core.build;
 
 import core.components.GearSet;
+import core.components.PropValue;
 import core.components.Property;
 import core.components.Stats;
 import core.utils.Constants;
@@ -55,6 +56,8 @@ public class FullBuild {
         this.stats.addProp(Property.FIREARM, 535F);
         this.stats.addProp(Property.STAMINA, 535F);
         this.stats.addProp(Property.ELECTRONIC, 535F);
+        
+        this.stats.addProp(Property.CRITICAL_HIT_DAMAGE, 25F);
         
         this.weapon1 = weapon1;
         this.weapon2 = weapon2;
@@ -283,7 +286,12 @@ public class FullBuild {
 
     public void updateSetBonuses() {
        
-            
+        for ( GearSet gearSet : gearsetCounts.keySet()) {
+            for (PropValue bonus : gearSet.getSetBonus(gearsetCounts.get(gearSet)) ) {
+                this.stats.addBonus(bonus);
+            }
+        }
+        
     }
 
     

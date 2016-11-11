@@ -11,7 +11,6 @@ import core.components.*;
 import core.components.gear.*;
 import core.components.gearsets.*;
 import core.components.weapontalents.*;
-import core.utils.*;
 
 /**
  *
@@ -132,9 +131,13 @@ public class Test {
 
 
         
-        Weapon weapon1 = new Weapon(WeaponFamily.LMG, WeaponType.Black_Market_M60_E6, 9491F, new Destructive( 15F,Float.NaN) , new PropValue( Property.OUT_OF_COVER_DAMAGE , 20F) );
+        Weapon weapon1 = new Weapon( WeaponType.Black_Market_M60_E6, 9491F, new Destructive( 15F,Float.NaN) , new PropValue( Property.OUT_OF_COVER_DAMAGE , 20F) );
         weapon1.addTalent(new Ferocious(10F, Float.NaN) );
-        weapon1.addTalent(new Deadly(25F, Float.NaN) );
+           
+        
+        Weapon weapon2 = new Weapon(WeaponType.Military_SCAR_H, 27157.98F, new Destructive( 15F,Float.NaN) , new PropValue( Property.HEADSHOT_DAMAGE , 161F) );
+        weapon2.addTalent(new Brutal(12F, Float.NaN) );
+        //weapon2.addTalent(new Deadly(25F, Float.NaN) );
         
         ModdedWeapon modw1 = new ModdedWeapon(weapon1);
         
@@ -147,7 +150,7 @@ public class Test {
         
         WeaponMod wMod2 = new WeaponMod("Mag RX",ModType.MAGAZINE);
         wMod2.addBonus(new PropValue(Property.CRITICAL_HIT_CHANCE, 3.0F));
-        wMod2.addBonus(new PropValue(Property.RATE_OF_FIRE, 6F));
+        wMod2.addBonus(new PropValue(Property.RATE_OF_FIRE, 5.7F));
         wMod2.addBonus(new PropValue(Property.MAGAZINE_SIZE, 111F));
         
         modw1.addMod(wMod2);
@@ -166,20 +169,53 @@ public class Test {
         
         
         FullBuild testBuild = new FullBuild("testBuild", myModPac, myModBod, myModGlo, myModHol, myModPad, myModMas );
-        testBuild.setWeapon1(modw1);
+        //testBuild.setWeapon1(modw1);
+        testBuild.updateSetBonuses();
         
-        Stats w1Stats = testBuild.getWeapon1().evaluate(testBuild.getStats());
+        Stats w1Stats = modw1.evaluate(testBuild.getStats(), 1F, 34.1F, true, 60F);
         
-        System.out.println(testBuild.getWeapon1().getAdjustedDamage(w1Stats));
-        System.out.println(testBuild.getWeapon1().getDamageToElites(w1Stats));
-        System.out.println(testBuild.getWeapon1().getDamageEnemyArmor(w1Stats));
         
-        System.out.println(testBuild.getWeapon1().getCriticalDamage(w1Stats,34F));
+        System.out.println("Adjusted Damage: " + modw1.getAdjustedDamage());
+        System.out.println("Damage to Elites: " +modw1.getDamageToElites());
+        System.out.println("Enemy Armor Damage: " +modw1.getDamageEnemyArmor());
+
         
-        System.out.println(testBuild.getWeapon1().getHeadshotDamage(w1Stats));
+        System.out.println("Damage After Crit: " + modw1.getCriticalDamage());
         
-        //Stats mStats = testBuild.getStats();
-        /*
+        System.out.println("Perc Headshot Damage : " +modw1.getPercHeadshotDamage());
+        
+        System.out.println("Headshot Damage: " +modw1.getHeadshotDamage());
+        System.out.println("Headshot Dmg After Crit: " + modw1.getCritHeadshotDamage());
+        
+        
+        
+        System.out.println("RPM: " +modw1.getRPM());
+        
+        System.out.println("Mag: " +modw1.getMag());
+        
+        System.out.println("Reload speed: " +modw1.getReloadSpeed());
+
+        System.out.println("Perc Crit Chance: " +modw1.getPercCriticalChance()); 
+        
+        
+        System.out.println(modw1.getFullBodyshotDmg()); 
+        System.out.println(modw1.getFullBodyshotAccurateDmg()); 
+        System.out.println(modw1.getFullHeadshotDmg()); 
+        System.out.println(modw1.getFullHeadshotAccurateDmg());
+        System.out.println(modw1.getFullCritBodyshotDmg());
+        System.out.println(modw1.getFullCritBodyshotAccurateDmg());
+        
+        System.out.println(modw1.getFullCritHeadshotDmg());
+        System.out.println(modw1.getFullCritHeadshotAccurateDmg());
+        
+        System.out.println(modw1.getTimeDumpMag());
+        
+        
+        System.out.println(modw1.getSustainedBodyShotDmg());
+        System.out.println(modw1.getSustainedHeadShotDmg());
+        System.out.println(modw1.getSustainedDPS());
+        
+        /*Stats mStats = testBuild.getStats();
         System.out.println(w1Stats.getMitigation(4));
         System.out.println(w1Stats.getSkillPower());
         System.out.println(w1Stats.getThoughness(0, 4));
@@ -187,13 +223,7 @@ public class Test {
         System.out.println(w1Stats.getThoughness(2, 4));
         */
         
-        System.out.println(testBuild);
-        
-        
-        //System.out.println(testBuild.getStats().getProp(Property.HEADSHOT_DAMAGE));
-        
-        //System.out.println(w1Stats.getProp(Property.HEADSHOT_DAMAGE));
-        //System.out.println(w1Stats.getProp(Property.ACCURACY));
+        //System.out.println(testBuild);
         
     }
     

@@ -109,7 +109,8 @@ public enum Property {
     MOBILE_COVER_BLAST_RESILIENCE("MCBR"),
     
     //Gear Set Bonuses
-    GEAR_HEADSHOT_DAMAGE("G_HSD");
+    GEAR_HEADSHOT_DAMAGE("G_HSD"),
+    GEAR_OPTIMAL_RANGE("G_OPR");
     
     private String value;
     
