@@ -21,7 +21,7 @@ public class HunterFaith extends GearSet{
     private static HunterFaith singleton = new HunterFaith();
     
     private HunterFaith() {
-        this.name = "Hunter Faith";
+        this.name = "Hunter's Faith";
     }
     
     public static HunterFaith getInstance() {

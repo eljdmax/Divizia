@@ -27,6 +27,8 @@ public class ModdedWeapon {
     private final static Float ONEISNONE_RECCURSIVE = 20F;
     private final static Float MAX_CRITICAL_CHANCE = 0.6F;
     
+    private String id = null;
+    
     private Weapon weapon;
     private List<WeaponMod> mods;
     
@@ -58,12 +60,23 @@ public class ModdedWeapon {
     private Float sustainedHeadShotDmg = 0F;
     private Float sustainedDPS = 0F;
     
+    public ModdedWeapon() {
+        this(null) ;
+    }
     
     public ModdedWeapon(Weapon weapon) {
         this.weapon = weapon;
         
         mods = new ArrayList<WeaponMod>() ;
         modStats = new Stats();
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
     
     public void addMod( WeaponMod weaponMod) {
@@ -87,6 +100,10 @@ public class ModdedWeapon {
         return false;
     }
 
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+    
     public Weapon getWeapon() {
         return weapon;
     }
@@ -99,6 +116,18 @@ public class ModdedWeapon {
         return modStats;
     }
 
+    @Override
+    public String toString() {
+        String ret = "Modded "+ weapon.toString();
+        
+        ret += "\n   Modds:";
+        for (WeaponMod mod : mods) {
+            ret += "\n\t" + mod.toString();
+        }
+        
+        return ret;
+    }    
+    
     public Float getAdjustedDamage() {
         return adjustedDamage;
     }
@@ -196,11 +225,6 @@ public class ModdedWeapon {
     }
 
     
-    
-    @Override
-    public String toString() {
-        return "Modded "+ weapon.toString();
-    }
     
     public Stats evaluate(Stats stats , Float pulseCritChance, Float pulseCritDmg, boolean oneIsNone, Float headshotAccuracy ) {
         Stats ret = weapon.applyTalents(stats);

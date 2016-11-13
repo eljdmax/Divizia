@@ -14,11 +14,21 @@ import java.util.List;
  */
 public abstract class GearSet {
     
+    protected String id = null;
     protected String name;
     
     public String getName() {
         return this.name;
     }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     
     public abstract List<PropValue> getSetBonus(int pieces);
     

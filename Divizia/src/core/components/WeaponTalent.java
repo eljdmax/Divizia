@@ -12,6 +12,8 @@ package core.components;
  */
 public abstract class WeaponTalent {
     
+    protected String id = null;
+    
     protected String name;
     
     protected Float value1;
@@ -36,6 +38,31 @@ public abstract class WeaponTalent {
         
         this.alwaysActived = false;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+        
+    
+    public void setValue1(Float value1) {
+        this.value1 = value1;
+    }
+
+    public void setValue2(Float value2) {
+        this.value2 = value2;
+    }
+
+    public Float getValue1() {
+        return value1;
+    }
+
+    public Float getValue2() {
+        return value2;
+    }
     
     public void setAlwaysActived(boolean alwaysActived) {
         this.alwaysActived = alwaysActived;
@@ -50,5 +77,10 @@ public abstract class WeaponTalent {
     public abstract boolean applyTalent(Stats stats);
     
     public abstract boolean removeTalent(Stats stats);
+    
+    @Override
+    public String toString() {
+        return name + " " + value1.toString() + "//"+ value2.toString();
+    }
     
 }

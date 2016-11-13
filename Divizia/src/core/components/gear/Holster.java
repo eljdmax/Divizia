@@ -15,6 +15,11 @@ import core.components.GearSet;
  */
 public class Holster extends Gear {
     
+    public Holster() {
+        super();
+        this.shortName = "holster";
+    }
+    
     public Holster(GearSet gearSet, Float baseArmor, Float baseFA, Float baseST, Float baseEL ) {
         super(gearSet, baseArmor, baseFA, baseST, baseEL );
         this.shortName = "holster";

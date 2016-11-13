@@ -12,12 +12,18 @@ package core.components;
  */
 public class PropValue {
     
+    protected String id = null;
+    
     private Property property;
     private Float value;
     private RecalibrationPosition recalibrationPosition;   
 
+    public PropValue() {
+        this(null,null);
+    }
+    
     public PropValue(Property property, Float value) {
-        this(property,value,RecalibrationPosition.NONE);
+        this(property,value,RecalibrationPosition.NONE);    
     }
     
     public PropValue(Property property, Float value, RecalibrationPosition recalibrationPosition ) {
@@ -26,6 +32,15 @@ public class PropValue {
         this.recalibrationPosition = recalibrationPosition;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    
     public Property getProperty() {
         return property;
     }
@@ -51,5 +66,9 @@ public class PropValue {
     }
     
     
+    @Override
+    public String toString() {
+        return property.name()+ " // " + value + " // " + recalibrationPosition.name();
+    }
     
 }

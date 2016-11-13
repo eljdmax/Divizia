@@ -16,6 +16,10 @@ import core.components.WeaponTalent;
  */
 public class Destructive extends WeaponTalent {
     
+    public Destructive() {
+        this(null,null);
+    }
+    
     public Destructive(Float value1, Float value2) {
         
         super("Destructive", 2000F, 2000F, 0F,  value1,  value2);

@@ -16,6 +16,10 @@ import core.components.WeaponTalent;
  */
 public class Deadly extends WeaponTalent {
     
+    public Deadly() {
+        this(null,null);
+    }
+    
     public Deadly(Float value1, Float value2) {
         
         super("Deadly", 2000F, 2000F, 0F,  value1,  value2);

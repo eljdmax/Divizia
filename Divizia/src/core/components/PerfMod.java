@@ -11,6 +11,11 @@ package core.components;
  * @author tchabole
  */
 public class PerfMod extends Mod {
+
+    public PerfMod() {
+        super();
+    }
+
     public PerfMod(String name, ModType type) {
         super(name, type);
     }

@@ -16,6 +16,10 @@ import core.components.WeaponTalent;
  */
 public class Ferocious extends WeaponTalent {
     
+    public Ferocious() {
+        this(null,null);
+    }
+    
     public Ferocious(Float value1, Float value2) {
         
         super("Ferocious", 2000F, 2000F, 0F,  value1,  value2);

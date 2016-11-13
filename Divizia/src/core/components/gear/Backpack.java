@@ -14,7 +14,12 @@ import core.components.GearSet;
  * @author tchabole
  */
 public class Backpack extends Gear {
-    
+
+    public Backpack() {
+        super();
+        this.shortName = "pack";
+    }
+ 
     public Backpack(GearSet gearSet, Float baseArmor, Float baseFA, Float baseST, Float baseEL ) {
         super(gearSet, baseArmor, baseFA, baseST, baseEL );
         this.shortName = "pack";

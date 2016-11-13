@@ -16,6 +16,10 @@ import core.components.WeaponTalent;
  */
 public class Brutal extends WeaponTalent {
     
+    public Brutal() {
+        this(null,null);
+    }
+    
     public Brutal(Float value1, Float value2) {
         
         super("Brutal", 2000F, 2000F, 0F,  value1,  value2);

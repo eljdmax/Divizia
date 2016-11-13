@@ -14,6 +14,11 @@ import core.components.GearSet;
  * @author tchabole
  */
 public class Mask extends Gear {
+  
+    public Mask() {
+        super();
+        this.shortName = "mask";
+    }
     
     public Mask(GearSet gearSet, Float baseArmor, Float baseFA, Float baseST, Float baseEL ) {
         super(gearSet, baseArmor, baseFA, baseST, baseEL );

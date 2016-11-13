@@ -16,8 +16,16 @@ import java.util.List;
  */
 public abstract class Gear {
     
+    protected String id = null;
+    
     protected GearSet gearSet;
     protected String shortName;
+    
+    protected Float armor = null;
+    protected Float FA = null;
+    protected Float ST = null;
+    protected Float EL = null;
+    
     
     protected Stats baseStats;
 
@@ -25,9 +33,20 @@ public abstract class Gear {
     
     protected Stats fullStats;
     
+    public Gear() {
+        this.baseStats = new Stats();
+        this.fullStats = new Stats(this.baseStats);
+        this.baseBonuses = new ArrayList<PropValue>() ;
+    }
     
     public Gear(GearSet gearSet, Float baseArmor, Float baseFA, Float baseST, Float baseEL ) {
         this.gearSet = gearSet;
+        
+        this.armor = baseArmor;
+        this.FA = baseFA;
+        this.ST = baseST;
+        this.EL = baseEL;
+        
         this.baseStats = new Stats();
         
         this.baseStats.addProp(Property.ARMOR, baseArmor);
@@ -39,6 +58,15 @@ public abstract class Gear {
         
         this.baseBonuses = new ArrayList<PropValue>() ;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     
     //public boolean canfit(Gear gear);
     
@@ -59,6 +87,11 @@ public abstract class Gear {
         
         ret.append(this.gearSet.getName()).append(" ").append(this.shortName).append(" ")
            .append(this.fullStats.displayMainStats());
+        
+        for (PropValue prop : baseBonuses) {
+            ret.append("\n\t").append(prop.toString());
+        }
+        
         
         return ret.toString();
     }
@@ -87,6 +120,64 @@ public abstract class Gear {
         this.baseBonuses = baseBonuses;
     }
 
+    public Float getArmor() {
+        return armor;
+    }
+
+    public void setArmor(Float armor) {
+        if (this.armor != null){
+            this.baseStats.removeProp(Property.ARMOR, this.armor);
+            this.fullStats.removeProp(Property.ARMOR, this.armor);
+        }
+        this.armor = armor;
+        this.baseStats.addProp(Property.ARMOR, armor);
+        this.fullStats.addProp(Property.ARMOR, armor);
+    }
+
+    public Float getFA() {
+        return FA;
+    }
+
+    public void setFA(Float FA) {
+        if (this.FA != null){
+            this.baseStats.removeProp(Property.FIREARM, this.FA);
+            this.fullStats.removeProp(Property.FIREARM, this.FA);
+        }
+        this.FA = FA;
+        this.baseStats.addProp(Property.FIREARM, FA);
+        this.fullStats.addProp(Property.FIREARM, FA);
+    }
+
+    public Float getST() {
+        return ST;
+    }
+
+    public void setST(Float ST) {
+        if (this.ST != null){
+            this.baseStats.removeProp(Property.STAMINA, this.ST);
+            this.fullStats.removeProp(Property.STAMINA, this.ST);
+        }
+        this.ST = ST;
+        this.baseStats.addProp(Property.STAMINA, ST);
+        this.fullStats.addProp(Property.STAMINA, ST);
+    }
+
+    public Float getEL() {
+        return EL;
+    }
+
+    public void setEL(Float EL) {
+        if (this.EL != null){
+            this.baseStats.removeProp(Property.ELECTRONIC, this.EL);
+            this.fullStats.removeProp(Property.ELECTRONIC, this.EL);
+        }
+        this.EL = EL;
+        this.baseStats.addProp(Property.ELECTRONIC, EL);
+        this.fullStats.addProp(Property.ELECTRONIC, EL);
+    }
+
+    
+    
     public Stats getBaseStats() {
         return baseStats;
     }
@@ -94,5 +185,7 @@ public abstract class Gear {
     public Stats getFullStats() {
         return fullStats;
     }
-
+    
+    
+    
 }

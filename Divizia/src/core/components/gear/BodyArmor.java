@@ -15,6 +15,11 @@ import core.components.GearSet;
  */
 public class BodyArmor extends Gear {
     
+    public BodyArmor() {
+        super();
+        this.shortName = "bodyarmor";
+    }
+    
     public BodyArmor(GearSet gearSet, Float baseArmor, Float baseFA, Float baseST, Float baseEL ) {
         super(gearSet, baseArmor, baseFA, baseST, baseEL );
         this.shortName = "bodyarmor";

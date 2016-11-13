@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class Weapon {
     
+    private String id = null;
+    
     private WeaponType weaponType;
     private PropValue weaponBonus;
     
@@ -32,13 +34,24 @@ public class Weapon {
         this.weaponType = weaponType;
         this.baseDamage = baseDamage;
         this.mainTalent = mainTalent;
-        this.mainTalent.setAlwaysActived(true);
+        
+        if (this.mainTalent != null) {
+            this.mainTalent.setAlwaysActived(true);
+        }
         
         this.weaponBonus = weaponBonus;
         
         this.extraTalents = new ArrayList<WeaponTalent>();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     public void addTalent(WeaponTalent talent) {
         this.extraTalents.add(talent);
     }
@@ -64,6 +77,10 @@ public class Weapon {
         return weaponBonus;
     }
     
+    public void setWeaponBonus(PropValue weaponBonus) {
+        this.weaponBonus = weaponBonus;
+    }
+    
     public Stats applyTalents(Stats stats){
         
         Stats ret = new Stats(stats);
@@ -72,15 +89,34 @@ public class Weapon {
             ret.addBonus(weaponBonus);
         }
         
-        this.mainTalent.applyTalent(ret);
+        if (mainTalent != null) {
+            mainTalent.applyTalent(ret);
+        }
         
-        for (WeaponTalent wt : this.extraTalents) {
+        for (WeaponTalent wt : extraTalents) {
             wt.applyTalent(ret);
         }
         
         return ret;
     }
     
-    
+    @Override
+    public String toString() {
+        String ret = weaponType.name() + " " + baseDamage.toString() ;
+        if (weaponBonus != null){
+            ret += "\n\tBonus: " + weaponBonus.toString();
+        }
+        
+        if (mainTalent != null){
+            ret += "\n\tMain Talent: " + mainTalent.toString();
+        }
+        
+        ret += "\n\tExtra Talents: ";
+        for (WeaponTalent wt : extraTalents) {
+            ret += "\n\t"+ wt.toString();
+        }
+        
+        return ret;
+    }
     
 }

@@ -11,6 +11,11 @@ package core.components;
  * @author tchabole
  */
 public class GearMod extends Mod {
+    
+    public GearMod() {
+        super();
+    }
+    
     public GearMod(String name, ModType type) {
         super(name, type);
     }

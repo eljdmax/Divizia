@@ -19,6 +19,8 @@ import java.util.HashMap;
  */
 public class FullBuild {
     
+    private String id = null;
+    
     private String name;
     
     private ModdedWeapon weapon1;
@@ -62,53 +64,28 @@ public class FullBuild {
         this.weapon1 = weapon1;
         this.weapon2 = weapon2;
         
-        Integer count;
         
-        this.backpack = backpack;
-        this.stats.mergeStats(backpack.getFullStats());
-        count = gearsetCounts.putIfAbsent(backpack.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(backpack.getGear().getGearSet(), count + 1);
-        }
+        setBackpack(backpack);
         
-        this.bodyArmor = bodyArmor;
-        this.stats.mergeStats(bodyArmor.getFullStats());
-        count = gearsetCounts.putIfAbsent(bodyArmor.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(bodyArmor.getGear().getGearSet(), count + 1);
-        }
+        setBodyArmor(bodyArmor);
         
-        this.gloves = gloves;
-        this.stats.mergeStats(gloves.getFullStats());
-        count = gearsetCounts.putIfAbsent(gloves.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(gloves.getGear().getGearSet(), count + 1);
-        }
+        setGloves(gloves);
         
-        this.holster = holster;
-        this.stats.mergeStats(holster.getFullStats());
-        count = gearsetCounts.putIfAbsent(holster.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(holster.getGear().getGearSet(), count + 1);
-        }
+        setHolster(holster);
         
-        this.kneepads = kneepads;
-        this.stats.mergeStats(kneepads.getFullStats());
-        count = gearsetCounts.putIfAbsent(kneepads.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(kneepads.getGear().getGearSet(), count + 1);
-        }
+        setKneepads(kneepads);
         
-        this.mask = mask;
-        this.stats.mergeStats(mask.getFullStats());
-        count = gearsetCounts.putIfAbsent(mask.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(mask.getGear().getGearSet(), count + 1);
-        }
-        
+        setMask(mask);
 
     }
-    
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     
     @Override
     public String toString() {
@@ -124,6 +101,16 @@ public class FullBuild {
         ret.append(Constants.NEWLINE);
         
         ret.append("Total :").append(this.stats.displayMainStats());
+        
+        ret.append(Constants.NEWLINE).append("Weapon 1: ");
+        if (weapon1 != null) {
+            ret.append(weapon1.toString());
+        }
+        
+        ret.append(Constants.NEWLINE).append("Weapon 2: ");
+        if (weapon2 != null) {
+            ret.append(weapon2.toString());
+        }
         
         return ret.toString();
     }
@@ -164,19 +151,29 @@ public class FullBuild {
         return backpack;
     }
 
-    public void setBackpack(ModdedGear backpack) {
+    public void updateBackpack(ModdedGear backpack) {
         removeBackpack();
+        setBackpack(backpack);
+    }    
+    
+    private void setBackpack(ModdedGear backpack) {
+
         this.backpack = backpack;
-        
-        Integer count = gearsetCounts.putIfAbsent(backpack.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(backpack.getGear().getGearSet(), count + 1);
+        if (backpack != null) {
+            this.stats.mergeStats(backpack.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(backpack.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(backpack.getGear().getGearSet(), count + 1);
+            }
         }
         
     }
     
-    public void removeBackpack() {
-        gearsetCounts.put(this.backpack.getGear().getGearSet(), gearsetCounts.get(this.backpack.getGear().getGearSet())  - 1);
+    private void removeBackpack() {
+        if (this.backpack != null) {
+            this.stats.subStats(this.backpack.getFullStats());
+            gearsetCounts.put(this.backpack.getGear().getGearSet(), gearsetCounts.get(this.backpack.getGear().getGearSet())  - 1);
+        }
         this.backpack = null;
     }
 
@@ -184,18 +181,27 @@ public class FullBuild {
         return bodyArmor;
     }
 
-    public void setBodyArmor(ModdedGear bodyArmor) {
+    public void updateBodyArmor(ModdedGear bodyArmor) {
         removeBodyArmor();
+        setBodyArmor(bodyArmor);
+    }
+    
+    private void setBodyArmor(ModdedGear bodyArmor) {
         this.bodyArmor = bodyArmor;
-        
-        Integer count = gearsetCounts.putIfAbsent(bodyArmor.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(bodyArmor.getGear().getGearSet(), count + 1);
+        if (bodyArmor != null) {
+            this.stats.mergeStats(bodyArmor.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(bodyArmor.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(bodyArmor.getGear().getGearSet(), count + 1);
+            }
         }
     }
     
-    public void removeBodyArmor() {
-        gearsetCounts.put(this.bodyArmor.getGear().getGearSet(), gearsetCounts.get(this.bodyArmor.getGear().getGearSet())  - 1);
+    private void removeBodyArmor() {
+        if (this.bodyArmor != null) {
+            this.stats.subStats(this.bodyArmor.getFullStats());
+            gearsetCounts.put(this.bodyArmor.getGear().getGearSet(), gearsetCounts.get(this.bodyArmor.getGear().getGearSet())  - 1);
+        }
         this.bodyArmor = null;
     }
 
@@ -203,18 +209,27 @@ public class FullBuild {
         return gloves;
     }
 
-    public void setGloves(ModdedGear gloves) {
+    public void updateGloves(ModdedGear gloves) {
         removeGloves();
+        setGloves(gloves);
+    }
+    
+    private void setGloves(ModdedGear gloves) {
         this.gloves = gloves;
-        
-        Integer count = gearsetCounts.putIfAbsent(gloves.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(gloves.getGear().getGearSet(), count + 1);
+        if (gloves != null) {
+            this.stats.mergeStats(gloves.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(gloves.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(gloves.getGear().getGearSet(), count + 1);
+            }
         }
     }
     
-    public void removeGloves() {
-        gearsetCounts.put(this.gloves.getGear().getGearSet(), gearsetCounts.get(this.gloves.getGear().getGearSet())  - 1);
+    private void removeGloves() {
+        if (this.gloves != null) {
+            this.stats.subStats(this.gloves.getFullStats());
+            gearsetCounts.put(this.gloves.getGear().getGearSet(), gearsetCounts.get(this.gloves.getGear().getGearSet())  - 1);
+        }
         this.gloves = null;
     }
 
@@ -222,37 +237,55 @@ public class FullBuild {
         return holster;
     }
 
-    public void setHolster(ModdedGear holster) {
+    public void updateHolster(ModdedGear holster) {
         removeHolster();
+        setHolster(holster);
+    }
+    
+    private void setHolster(ModdedGear holster) {
         this.holster = holster;
-        
-        Integer count = gearsetCounts.putIfAbsent(holster.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(holster.getGear().getGearSet(), count + 1);
+        if (holster != null) {
+            this.stats.mergeStats(holster.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(holster.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(holster.getGear().getGearSet(), count + 1);
+            }
         }
     }
     
-    public void removeHolster() {
-        gearsetCounts.put(this.holster.getGear().getGearSet(), gearsetCounts.get(this.holster.getGear().getGearSet())  - 1);
+    private void removeHolster() {
+        if (this.holster != null) {
+            this.stats.subStats(this.holster.getFullStats());
+            gearsetCounts.put(this.holster.getGear().getGearSet(), gearsetCounts.get(this.holster.getGear().getGearSet())  - 1);
+        }
         this.holster = null;
     }
 
     public ModdedGear getKneepads() {
         return kneepads;
     }
-
-    public void setKneepads(ModdedGear kneepads) {
+    
+    public void updateKneepads(ModdedGear kneepads) {
         removeKneepads();
+        setKneepads(kneepads);
+    }
+
+    private void setKneepads(ModdedGear kneepads) {
         this.kneepads = kneepads;
-        
-        Integer count = gearsetCounts.putIfAbsent(kneepads.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(kneepads.getGear().getGearSet(), count + 1);
+        if (kneepads != null) {
+            this.stats.mergeStats(kneepads.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(kneepads.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(kneepads.getGear().getGearSet(), count + 1);
+            }
         }
     }
     
-    public void removeKneepads() {
-        gearsetCounts.put(this.kneepads.getGear().getGearSet(), gearsetCounts.get(this.kneepads.getGear().getGearSet())  - 1);
+    private void removeKneepads() {
+        if (this.kneepads != null) {
+            this.stats.subStats(this.kneepads.getFullStats());
+            gearsetCounts.put(this.kneepads.getGear().getGearSet(), gearsetCounts.get(this.kneepads.getGear().getGearSet())  - 1);
+        }
         this.kneepads = null;
     }
 
@@ -261,18 +294,28 @@ public class FullBuild {
         return mask;
     }
 
-    public void setMask(ModdedGear mask) {
-        removeMasks();
+    
+    public void updateMask(ModdedGear mask) {
+        this.removeMasks();
+        this.setMask(mask);
+    }
+    
+    private void setMask(ModdedGear mask) {
         this.mask = mask;
-        
-        Integer count = gearsetCounts.putIfAbsent(mask.getGear().getGearSet(), 0);
-        if (count != null) {
-            gearsetCounts.put(mask.getGear().getGearSet(), count + 1);
+        if (mask != null) {
+            this.stats.mergeStats(mask.getFullStats());
+            Integer count = gearsetCounts.putIfAbsent(mask.getGear().getGearSet(), 0);
+            if (count != null) {
+                gearsetCounts.put(mask.getGear().getGearSet(), count + 1);
+            }
         }
     }    
     
-    public void removeMasks() {
-        gearsetCounts.put(this.mask.getGear().getGearSet(), gearsetCounts.get(this.mask.getGear().getGearSet())  - 1);
+    private void removeMasks() {
+        if (this.mask != null) {
+            this.stats.subStats(this.mask.getFullStats());
+            gearsetCounts.put(this.mask.getGear().getGearSet(), gearsetCounts.get(this.mask.getGear().getGearSet())  - 1);
+        }
         this.mask = null;
     }
 

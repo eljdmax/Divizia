@@ -3,29 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/Gear.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/build/ModdedWeapon.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/gear/Holster.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/WeaponFamily.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/Stats.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/WeaponType.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/WeaponTalent.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/Mod.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/weapontalents/Brutal.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/main/Test.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/PropValue.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/WeaponMod.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/Weapon.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/build/FullBuild.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/ModType.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/Property.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/RecalibrationPosition.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/gear/Kneepads.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/PerfMod.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/build/ModdedGear.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/GearMod.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/gear/Gloves.java</file>
-            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/Divizia/src/core/components/gear/Mask.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/resource/schemas/sqllite.sql</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/gear/BodyArmor.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/backend/Persistable.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/GearSet.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/build/FullBuild.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/Gear.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/gearsets/HunterFaith.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/Stats.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/main/Test.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/gearsets/Reclaimer.java</file>
+            <file>file:/C:/Users/Administrator/Documents/NetBeansProjects/TheDivizia/Divizia/src/backend/dbs/SQLLite.java</file>
         </group>
     </open-files>
 </project-private>

@@ -12,6 +12,10 @@ package core.components;
  */
 public class WeaponMod extends Mod {
     
+    public WeaponMod () {
+        super();
+    }
+    
     public WeaponMod(String name, ModType type) {
         super(name, type);
     }
