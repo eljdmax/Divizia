@@ -20,6 +20,8 @@ public interface Persistable {
     public HashMap<Integer,PropValue> loadPropValues();
     public HashMap<Integer,Mod> loadMods();
     public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets);
+    public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets, String gearType);
+    
     public HashMap<Integer,WeaponTalent> loadWeaponTalents();
     public HashMap<Integer,Weapon> loadWeapons();
     public HashMap<Integer,ModdedWeapon> loadModdedWeapons();

@@ -85,6 +85,16 @@ public abstract class Gear {
     public String toString() {
         StringBuilder ret = new StringBuilder();
         
+        ret.append("<html>").append(this.gearSet.getName()).append(" ")
+           .append(this.fullStats.displayMainStats()).append("</html>");
+        
+        
+        return ret.toString();
+    }
+    
+    public String printAllDetails() {
+        StringBuilder ret = new StringBuilder();
+        
         ret.append(this.gearSet.getName()).append(" ").append(this.shortName).append(" ")
            .append(this.fullStats.displayMainStats());
         

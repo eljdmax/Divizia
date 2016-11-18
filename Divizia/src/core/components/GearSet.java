@@ -33,4 +33,9 @@ public abstract class GearSet {
     public abstract List<PropValue> getSetBonus(int pieces);
     
     // Set bonuses ??
+    
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

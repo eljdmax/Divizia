@@ -94,10 +94,10 @@ public class Stats {
     public String displayMainStats() {
         StringBuilder ret = new StringBuilder();
         
-        ret.append(Float.toString(this.params.get(Property.ARMOR))).append(" ")
+        ret.append(Float.toString(this.params.get(Property.ARMOR))).append("<br />").append(" [")
            .append(Float.toString(this.params.get(Property.FIREARM))).append(Constants.SPACE)
            .append(Float.toString(this.params.get(Property.STAMINA))).append(Constants.SPACE)
-           .append(Float.toString(this.params.get(Property.ELECTRONIC)));
+           .append(Float.toString(this.params.get(Property.ELECTRONIC))).append("]");
         
         return ret.toString();
     }

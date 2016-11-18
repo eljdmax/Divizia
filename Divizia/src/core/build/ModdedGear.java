@@ -88,7 +88,27 @@ public class ModdedGear {
     
     @Override
     public String toString() {
-        String ret = "Modded "+ gear.toString();
+        String ret;
+        
+        ret = "<html>" + this.gear.getGearSet().getName() + " "
+            + this.fullStats.displayMainStats() 
+            + "</html>";
+        
+        return ret;
+    }
+    
+    public String displayText() {
+        String ret;
+        
+        ret = "<html>" + this.gear.getGearSet().getName() + "<br />"
+            + "Armor: " + this.fullStats.displayMainStats() 
+            + "</html>";
+        
+        return ret;
+    }
+    
+    public String printAllDetails() {
+        String ret = "Modded "+ gear.printAllDetails();
         
         ret += "\n   Modds:";
         for (GearMod mod : mods) {

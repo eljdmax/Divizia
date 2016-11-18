@@ -6,13 +6,15 @@
 
 package core.utils;
 
+import core.components.RecalibrationPosition;
+
 /**
  *
  * @author tchabole
  */
 public enum Constants {
     
-    SPACE("//"),
+    SPACE("|"),
     NEWLINE("\n");
     
     
@@ -25,6 +27,37 @@ public enum Constants {
     @Override
     public String toString() {
         return value;
+    }
+    
+    
+    public final static int MAX_MOD_ATTRIBUTES = 5;
+    
+    public final static int GEAR_MAJ = 1;
+    public final static int GEAR_SKI = 2;
+    public final static int GEAR_MOD = 8;
+    public final static int WEAPON_MOD = 8;
+    public final static int GEAR_SET = 16;
+    
+    public final static int recalibrationList(RecalibrationPosition pos) {
+        
+        switch (pos) {
+            case MAJOR_1 :
+            case MAJOR_2 :
+            case MAJOR_3 :
+            case MAJOR_4 :
+            case MINOR_1 :
+            case MINOR_2 :
+            case MINOR_3 :
+            case MINOR_4 :    
+                return GEAR_MAJ;
+                
+            case SKILL_1 :
+            case SKILL_2 :
+            case SKILL_3 :
+                return GEAR_SKI;
+        }
+        
+        return -1;
     }
     
 }

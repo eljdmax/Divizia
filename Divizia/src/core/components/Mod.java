@@ -64,13 +64,19 @@ public abstract class Mod {
         return bonus;
     }
     
-    @Override
-    public String toString() {
+    public String printAllDetails() {
         String ret = name + " ( "+ type.name() +" ) : ";
         
         for (PropValue prop : bonus) {
             ret += "\n\t"+prop.toString();
         }
+        
+        return ret;
+    }
+    
+    @Override
+    public String toString() {
+        String ret = name + " [ "+ type.name() +" ]";
         
         return ret;
     }

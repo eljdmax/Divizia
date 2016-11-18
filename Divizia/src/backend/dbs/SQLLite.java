@@ -657,12 +657,18 @@ public class SQLLite implements Persistable{
         return gear;
     }
     
-    private HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets, String moddedGearId, Statement stmt) throws Exception {
+    private HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets, String moddedGearId, String gearType, Statement stmt) throws Exception {
         HashMap<Integer,ModdedGear> ret = new HashMap<Integer,ModdedGear>();
         
         String query = "SELECT rowid, * FROM MODDED_GEAR ";
+        
+        
         if (moddedGearId != null) {
             query += " WHERE rowid = "+moddedGearId;
+        }
+        
+        if (gearType != null) {
+            query = " SELECT mg.rowid, mg.* FROM ("+ query +") mg JOIN GEAR g ON mg.GEAR_ID = g.rowid  WHERE g.CLASS_TYPE = '"+gearType+"' ";
         }
 
         ResultSet rs = stmt.executeQuery(query);
@@ -690,8 +696,14 @@ public class SQLLite implements Persistable{
         return ret;
     }
     
+    
     @Override
     public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets) {
+        return loadModdedGears(gearSets, null);
+    }
+    
+    @Override
+    public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets , String gearType) {
         HashMap<Integer,ModdedGear> ret = null;
         
         Connection c = null;
@@ -700,7 +712,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            ret = loadModdedGears(gearSets,null,stmt);
+            ret = loadModdedGears(gearSets,null,gearType,stmt);
             
             stmt.close();
         } catch (Exception ex) {
@@ -1386,7 +1398,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            HashMap<Integer,ModdedGear> mappedModdedGear = loadModdedGears(gearSets, moddedGearId, stmt);
+            HashMap<Integer,ModdedGear> mappedModdedGear = loadModdedGears(gearSets, moddedGearId, null, stmt);
             
             for (Integer i : mappedModdedGear.keySet() ){
                 moddedGear = mappedModdedGear.get(i);

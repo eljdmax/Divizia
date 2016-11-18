@@ -47,11 +47,11 @@ public class Test {
         //    System.out.println(gears.get(i).toString());
         //}
         
-        //HashMap<Integer,Mod> mods = backend.loadMods();
+        HashMap<Integer,Mod> mods = backend.loadMods();
         
-        //for (Integer i : mods.keySet()) {
-        //    System.out.println(mods.get(i).toString());
-        //}
+        for (Integer i : mods.keySet()) {
+           System.out.println(mods.get(i).toString());
+        }
         
         HashMap<Integer,ModdedGear> moddedGears = backend.loadModdedGears(gearSets);
         
@@ -71,6 +71,8 @@ public class Test {
         //for (Integer i : moddedWeapons.keySet()) {
         //    System.out.println(moddedWeapons.get(i).toString());
         //}
+        
+        
         
         HashMap<Integer,FullBuild> fullbuilds = backend.loadFullBuilds(gearSets);
         
