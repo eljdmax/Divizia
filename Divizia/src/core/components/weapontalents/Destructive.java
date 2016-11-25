@@ -16,20 +16,21 @@ import core.components.WeaponTalent;
  */
 public class Destructive extends WeaponTalent {
     
-    public Destructive() {
-        this(null,null);
+    private static Destructive singleton = new Destructive();
+    
+    private Destructive() {
+        super("Destructive",  2000F, 2000F, 0F, new Float[] {12F} );
     }
     
-    public Destructive(Float value1, Float value2) {
-        
-        super("Destructive", 2000F, 2000F, 0F,  value1,  value2);
+    public static Destructive getInstance() {
+        return singleton;
     }
     
     @Override
     public boolean applyTalent(Stats stats) {
         
         if (this.isActivated(stats))  {
-            stats.addProp(Property.ENEMY_ARMOR_DAMAGE, this.value1);
+            stats.addProp(Property.ENEMY_ARMOR_DAMAGE, this.values[0]);
             return true;
         }
         
@@ -40,7 +41,7 @@ public class Destructive extends WeaponTalent {
     public boolean removeTalent(Stats stats) {
         
         if (this.isActivated(stats))  { //??
-            stats.removeProp(Property.ENEMY_ARMOR_DAMAGE, this.value1);
+            stats.removeProp(Property.ENEMY_ARMOR_DAMAGE, this.values[0]);
             return true;
         }
         

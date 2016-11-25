@@ -20,11 +20,17 @@ public class Weapon {
     private WeaponType weaponType;
     private PropValue weaponBonus;
     
+    private int gearScore =  0;
+    
     private Float baseDamage;
 
     private WeaponTalent mainTalent;
     
     private List<WeaponTalent> extraTalents;
+    
+    public Weapon(WeaponType weaponType, Float baseDamage) {
+        this(weaponType, baseDamage, null, null);
+    }
     
     public Weapon(WeaponType weaponType, Float baseDamage, WeaponTalent mainTalent) {
         this(weaponType, baseDamage, mainTalent, null);
@@ -51,6 +57,14 @@ public class Weapon {
     public void setId(String id) {
         this.id = id;
     }
+
+    public int getGearScore() {
+        return gearScore;
+    }
+
+    public void setGearScore(int gearScore) {
+        this.gearScore = gearScore;
+    }
     
     public void addTalent(WeaponTalent talent) {
         this.extraTalents.add(talent);
@@ -67,6 +81,26 @@ public class Weapon {
 
     public WeaponTalent getMainTalent() {
         return mainTalent;
+    }
+
+    public void setWeaponType(WeaponType weaponType) {
+        this.weaponType = weaponType;
+    }
+
+    public void setBaseDamage(Float baseDamage) {
+        this.baseDamage = baseDamage;
+    }
+
+    public void setMainTalent(WeaponTalent mainTalent) {
+        this.mainTalent = mainTalent;
+    }
+    
+    public void addExtraTalent(WeaponTalent talent) {
+        extraTalents.add(talent);
+    }
+    
+    public void clearExtraTalents() {
+        extraTalents.clear();
     }
 
     public List<WeaponTalent> getExtraTalents() {

@@ -4,7 +4,21 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/main/Test.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/Property.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/ModFormGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/Gear.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/ModType.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/Stats.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/FullBuildGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/PropertyGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/GearFormGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/utils/Constants.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/main/MainGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/ComponentBonusGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/PropValue.java</file>
             <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/main/BuildGUI.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/core/components/RecalibrationPosition.java</file>
+            <file>file:/C:/Users/tchabole/Documents/NetBeansProjects/TheDivizia/Divizia/src/frontend/components/GearDisplayGUI.java</file>
         </group>
     </open-files>
 </project-private>

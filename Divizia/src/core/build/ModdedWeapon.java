@@ -8,6 +8,7 @@ package core.build;
 
 import core.components.Gear;
 import core.components.GearMod;
+import core.components.ModType;
 import core.components.PropValue;
 import core.components.Property;
 import core.components.Stats;
@@ -15,6 +16,7 @@ import core.components.Weapon;
 import core.components.WeaponFamily;
 import core.components.WeaponMod;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -31,6 +33,7 @@ public class ModdedWeapon {
     
     private Weapon weapon;
     private List<WeaponMod> mods;
+    private HashMap<WeaponMod, ModType> modsPosition;
     
     private Stats modStats;
     
@@ -68,6 +71,7 @@ public class ModdedWeapon {
         this.weapon = weapon;
         
         mods = new ArrayList<WeaponMod>() ;
+        modsPosition = new HashMap<WeaponMod,ModType>() ;
         modStats = new Stats();
     }
     
@@ -79,13 +83,31 @@ public class ModdedWeapon {
         this.id = id;
     }
     
-    public void addMod( WeaponMod weaponMod) {
+    public void clearMods() {
+        for (WeaponMod weaponMod : mods) {
+            for (PropValue prop : weaponMod.getBonus()) {
+                modStats.removeBonus(prop);
+            }
+        }
+        
+        modsPosition.clear();
+        mods.clear();
+    }
+    
+    public void addMod( WeaponMod weaponMod, ModType pos) {
         //safeguard!!
+        
+        if (weaponMod == null) {
+            return;
+        }
+        
         mods.add(weaponMod);
         
         for (PropValue prop : weaponMod.getBonus()) {
             modStats.addBonus(prop);
         }
+        
+        modsPosition.put(weaponMod,pos);
     }
     
     public boolean removeMod(WeaponMod weaponMod){
@@ -94,6 +116,7 @@ public class ModdedWeapon {
             for (PropValue prop : weaponMod.getBonus()) {
                 modStats.removeBonus(prop);
             }
+            modsPosition.remove(weaponMod);
             return true;
         }
         
@@ -111,13 +134,36 @@ public class ModdedWeapon {
     public List<WeaponMod> getMods() {
         return mods;
     }
+    
+    public HashMap<WeaponMod, ModType> getModsPosition() {
+        return modsPosition;
+    }
 
     public Stats getModStats() {
         return modStats;
     }
 
+    public String displayText() {
+        String ret;
+        
+        ret = "<html>" + weapon.toString() + "<br />"
+            + "</html>"; //+ talents
+        
+        return ret;
+    }
+    
     @Override
     public String toString() {
+        String ret;
+        
+        ret = "<html>" + Integer.toString(this.weapon.getGearScore()) + " "+this.weapon.getWeaponType().name() + "<br />"
+            + this.weapon.getBaseDamage().toString()
+            + "</html>";
+        
+        return ret;
+    }
+    
+    public String printAllDetails() {
         String ret = "Modded "+ weapon.toString();
         
         ret += "\n   Modds:";
@@ -126,7 +172,7 @@ public class ModdedWeapon {
         }
         
         return ret;
-    }    
+    }
     
     public Float getAdjustedDamage() {
         return adjustedDamage;

@@ -16,20 +16,21 @@ import core.components.WeaponTalent;
  */
 public class Ferocious extends WeaponTalent {
     
-    public Ferocious() {
-        this(null,null);
+    private static Ferocious singleton = new Ferocious();
+    
+    private Ferocious() {
+        super("Ferocious",  2000F, 2000F, 0F, new Float[] {12F} );
     }
     
-    public Ferocious(Float value1, Float value2) {
-        
-        super("Ferocious", 2000F, 2000F, 0F,  value1,  value2);
+    public static Ferocious getInstance() {
+        return singleton;
     }
     
     @Override
     public boolean applyTalent(Stats stats) {
         
         if (this.isActivated(stats))  {
-            stats.addProp(Property.DAMAGE_VS_ELITES, this.value1);
+            stats.addProp(Property.DAMAGE_VS_ELITES, this.values[0]);
             return true;
         }
         
@@ -40,7 +41,7 @@ public class Ferocious extends WeaponTalent {
     public boolean removeTalent(Stats stats) {
         
         if (this.isActivated(stats))  { //??
-            stats.removeProp(Property.DAMAGE_VS_ELITES, this.value1);
+            stats.removeProp(Property.DAMAGE_VS_ELITES, this.values[0]);
             return true;
         }
         

@@ -16,20 +16,22 @@ import core.components.WeaponTalent;
  */
 public class Brutal extends WeaponTalent {
     
-    public Brutal() {
-        this(null,null);
+    private static Brutal singleton = new Brutal();
+    
+    private Brutal() {
+        super("Brutal",  2000F, 2000F, 0F, new Float[] {12F} );
     }
     
-    public Brutal(Float value1, Float value2) {
-        
-        super("Brutal", 2000F, 2000F, 0F,  value1,  value2);
+    public static Brutal getInstance() {
+        return singleton;
     }
+    
     
     @Override
     public boolean applyTalent(Stats stats) {
         
         if (this.isActivated(stats))  {
-            stats.addProp(Property.HEADSHOT_DAMAGE, this.value1);
+            stats.addProp(Property.HEADSHOT_DAMAGE, this.values[0]);
             return true;
         }
         
@@ -40,7 +42,7 @@ public class Brutal extends WeaponTalent {
     public boolean removeTalent(Stats stats) {
         
         if (this.isActivated(stats))  {
-            stats.removeProp(Property.HEADSHOT_DAMAGE, this.value1);
+            stats.removeProp(Property.HEADSHOT_DAMAGE, this.values[0]);
             return true;
         }
         

@@ -2,8 +2,20 @@ package frontend.components;
 
 import core.components.Mod;
 import core.components.PropValue;
+import core.components.Property;
+import core.components.RecalibrationPosition;
 import core.utils.Constants;
 import frontend.main.MainGUI;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  *
@@ -48,6 +60,19 @@ public class ComponentBonusGUI extends javax.swing.JPanel {
             this.add(propertyComboBox);
         } else {
             propertyLabel = new javax.swing.JLabel();
+            propertyLabel.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (mod != null) {
+                        mainGUI.getModFormPanel().updateMod(mod);
+                    }
+                }
+            });
             propertyLabel.setFont(MainGUI.DEFAULT_FONT); // NOI18N
             propertyLabel.setText(bonus.getProperty().toString());
             this.add(propertyLabel);
@@ -65,24 +90,75 @@ public class ComponentBonusGUI extends javax.swing.JPanel {
 
     }
     
-    public void updateBonus(PropValue bonus) {
+    public PropValue getUpdatedBonus() {
+        Property theProp = (Property) propertyComboBox.getSelectedItem();
+        if (theProp == null) {
+            return null;
+        }
+        
+        bonus.setProperty(theProp);
+        
+        if (theProp == Property.EMPTY) {  
+            bonus.setValue(0F);
+            return bonus;
+        }
+        
+        if (propertyValueText.getText() == null || propertyValueText.getText().isEmpty() )  {
+            return null;
+        }
+        
+        bonus.setValue(Float.parseFloat(propertyValueText.getText()));
+        return bonus;
+    }
+    
+    public Mod getMod() {
+        return mod;
+    }
+    
+    public boolean canReceiveMod() {
+        return (propertyComboBox.getSelectedItem() == null || ((Property) propertyComboBox.getSelectedItem()) == Property.EMPTY  );
+    }
+    
+    public void updateBonus(PropValue bonus, Mod mod) {
         this.bonus = bonus;
+        this.mod = mod;
+        updateLayout();
+    }
+    
+    public void setMod(Mod mod) {
+        bonus.setProperty(Property.EMPTY);
+        this.mod = mod;
         updateLayout();
     }
     
     public void clearBonus() {
-        this.bonus = null;
+        RecalibrationPosition pos = this.bonus.getRecalibrationPosition();
+        this.bonus = new PropValue();
+        this.mod = null;
+        this.bonus.setRecalibrationPosition(pos);
+        
         updateLayout();
     }
     
     private void updateLayout() {
         String bonusValueText = "";
-        if (bonus != null) {
+        
+        if (mod != null) {
+            bonusValueText = mod.getName();
+        }
+        else if (bonus.getValue() != null) {
             bonusValueText = bonus.getValue().toString();
         }
-        
         propertyValueText.setText(bonusValueText);
+        
+        if (editable ) {
+            propertyComboBox.setSelectedItem(bonus.getProperty());
+        }
+             
     }
+    
+  
+    
     
     private javax.swing.JComboBox propertyComboBox;
     private javax.swing.JLabel propertyLabel;

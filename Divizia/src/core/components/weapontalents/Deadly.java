@@ -16,20 +16,21 @@ import core.components.WeaponTalent;
  */
 public class Deadly extends WeaponTalent {
     
-    public Deadly() {
-        this(null,null);
+    private static Deadly singleton = new Deadly();
+    
+    private Deadly() {
+        super("Deadly",  2000F, 2000F, 0F, new Float[] {12F} );
     }
     
-    public Deadly(Float value1, Float value2) {
-        
-        super("Deadly", 2000F, 2000F, 0F,  value1,  value2);
+    public static Deadly getInstance() {
+        return singleton;
     }
     
     @Override
     public boolean applyTalent(Stats stats) {
         
         if (this.isActivated(stats))  {
-            stats.addProp(Property.CRITICAL_HIT_DAMAGE, this.value1);
+            stats.addProp(Property.CRITICAL_HIT_DAMAGE, this.values[0]);
             return true;
         }
         
@@ -40,7 +41,7 @@ public class Deadly extends WeaponTalent {
     public boolean removeTalent(Stats stats) {
         
         if (this.isActivated(stats))  { //??
-            stats.removeProp(Property.CRITICAL_HIT_DAMAGE, this.value1);
+            stats.removeProp(Property.CRITICAL_HIT_DAMAGE, this.values[0]);
             return true;
         }
         

@@ -10,17 +10,22 @@ import backend.Persistable;
 import backend.dbs.SQLLite;
 import core.build.*;
 import core.components.*;
-import core.components.gear.*;
 import core.components.gearsets.*;
 import core.utils.Constants;
 import frontend.components.*;
+import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
 
 /**
  *
@@ -31,21 +36,26 @@ public class MainGUI extends javax.swing.JFrame {
     /**
      * Constants for laying out the GUI.
      */
-    private final static int HEIGHT = 580,  WIDTH = 1080;
+    private final static int HEIGHT = 620,  WIDTH = 1280;
     public final static java.awt.Font DEFAULT_FONT = new java.awt.Font("Tahoma", 0, 9);
     public final static java.awt.Font DEFAULT_FONT_BOLD = new java.awt.Font("Tahoma", java.awt.Font.BOLD, 9);
     
     
     private HashMap<String,GearSet> gearSetsMap;
+    private HashMap<String,WeaponTalent> weaponTalentsMap;
     private HashMap<Integer,Property[]> propertyListMap;
+    private HashMap<Integer,ModType[]> modPropertyListMap;
     private HashMap<Integer,GearSet> gearSets;
+    private HashMap<Integer,WeaponTalent> weaponTalents;
+    
     private GearSet[] gearSetsList;
+    private WeaponTalent[] weaponTalentsList;
+    private WeaponTalent[] extendedWeaponTalentsList;
 
     
     private HashMap<Integer,ModdedWeapon> mainWeapons;
     private HashMap<Integer,ModdedWeapon> pistols;
     
-    private HashMap<Integer,Mod> modsMap;
     private HashMap<Integer,FullBuild> fullbuilds;
             
     private Persistable backend ;
@@ -59,48 +69,32 @@ public class MainGUI extends javax.swing.JFrame {
 
     private void loadData() {
         
-        gearSetsMap = new HashMap<String,GearSet>();
-        gearSetsMap.put(HunterFaith.getInstance().getName(), HunterFaith.getInstance());
-        gearSetsMap.put(Reclaimer.getInstance().getName(), Reclaimer.getInstance());
+        gearSetsMap = Constants.getGearSetsMap();
+        weaponTalentsMap = Constants.getWeaponTalentsMap() ;
         
-        int gearConstants[] = {Constants.GEAR_MAJ, Constants.GEAR_SKI, Constants.WEAPON_MOD, Constants.GEAR_SET};
+
+        propertyListMap = Constants.getPropertyListMap();
+        modPropertyListMap = Constants.getModPropertyListMap();
         
-        HashMap<Integer,List<Property>> tmpPropertyListMap = new HashMap<Integer,List<Property>>();
-        
-        for (int i : gearConstants) {
-            tmpPropertyListMap.put(i, new ArrayList<Property>());
-        }
-        
-        int category;
-        for (Property prop : Property.values()) {
-            category = prop.getCategory();
-            for (int i : gearConstants) {
-                if ( (category & i) > 0) {
-                    tmpPropertyListMap.get(i).add(prop);
-                }
-            }
-        }
-        
-        propertyListMap = new HashMap<Integer,Property[]>();
-        for (int i : gearConstants) {
-            propertyListMap.put( i ,  tmpPropertyListMap.get(i).toArray(new Property[tmpPropertyListMap.get(i).size()]) );
-        }
-        
-                
-        backend = new SQLLite("resource/dbs/test.db");
+        backend = new SQLLite("resource/dbs/newtest.db");
         
         
         gearSets = backend.loadGearSets(gearSetsMap);        
         gearSetsList = gearSets.values().toArray(new GearSet[gearSets.keySet().size()]);
         
+        
+        weaponTalents = backend.loadWeaponTalents(weaponTalentsMap);
+        weaponTalentsList = weaponTalents.values().toArray(new WeaponTalent[weaponTalents.keySet().size()]);
+        
+        HashMap<Integer,WeaponTalent> extendedWeaponTalents = new HashMap<Integer,WeaponTalent>();
+        extendedWeaponTalents.put(0, null);
+        extendedWeaponTalents.putAll(weaponTalents);
+        extendedWeaponTalentsList = extendedWeaponTalents.values().toArray(new WeaponTalent[extendedWeaponTalents.keySet().size()]);
+        
 
         
-        modsMap = backend.loadMods();
         
-        
-
-        
-        fullbuilds = backend.loadFullBuilds(gearSets);
+        fullbuilds = backend.loadFullBuilds(gearSets, weaponTalents);
     }
     
     /**
@@ -122,6 +116,7 @@ public class MainGUI extends javax.swing.JFrame {
         moddedTopPanel = new javax.swing.JPanel();
         moddedMainPanel = new javax.swing.JPanel();
         gearFormPanel = new GearFormGUI(this);
+        weaponFormPanel = new WeaponFormGUI(this);
 
         moddedBottomPanel = new javax.swing.JPanel();
         componentSaveBtn = new javax.swing.JButton();
@@ -149,8 +144,6 @@ public class MainGUI extends javax.swing.JFrame {
 
         
         getContentPane().add(topStatPanel, java.awt.BorderLayout.NORTH);
-
-        mainPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         
         getContentPane().add(mainPanel, java.awt.BorderLayout.CENTER);
 
@@ -163,6 +156,7 @@ public class MainGUI extends javax.swing.JFrame {
         jTabbedPanel.addTab("Default", defaultBuildTab);
 
         FullBuild fullBuild;
+        FullBuildGUI buildTab;
         for (Integer i : fullbuilds.keySet()) {
             fullBuild = fullbuilds.get(i);
             buildTab = new FullBuildGUI(this,fullBuild);
@@ -186,20 +180,32 @@ public class MainGUI extends javax.swing.JFrame {
 
         moddedMainPanel.setLayout(new java.awt.BorderLayout());
 
-        moddedMainPanel.add(gearFormPanel, java.awt.BorderLayout.CENTER);
+        // moddedMainPanel.add(gearFormPanel, java.awt.BorderLayout.CENTER);
 
+        moddedMainPanel.add(weaponFormPanel, java.awt.BorderLayout.CENTER);
+        
         moddedPanel.add(moddedMainPanel, java.awt.BorderLayout.CENTER);
 
         moddedBottomPanel.setPreferredSize(new java.awt.Dimension(365, 24));
 
         componentSaveBtn.setFont(DEFAULT_FONT); // NOI18N
         componentSaveBtn.setText("Save");
+        componentSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                componentSaveBtnActionPerformed(evt);
+            }
+        });
 
         componentDeleteBtn.setFont(DEFAULT_FONT); // NOI18N
         componentDeleteBtn.setText("Delete");
 
         componentnewBtn.setFont(DEFAULT_FONT); // NOI18N
         componentnewBtn.setText("New");
+        componentnewBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                componentNewBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout moddedBottomPanelLayout = new javax.swing.GroupLayout(moddedBottomPanel);
         moddedBottomPanel.setLayout(moddedBottomPanelLayout);
@@ -228,11 +234,16 @@ public class MainGUI extends javax.swing.JFrame {
 
         componentPanel.setTopComponent(moddedPanel);
 
+
+        modsScrollPane.setMinimumSize(new java.awt.Dimension(100, 0));
         
         modsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Mods"));
         
         modsList.setFont(DEFAULT_FONT);
-
+        
+        modsList.setDragEnabled(true);
+        modsList.setTransferHandler(new ModListTransferHandler());
+        
         modsScrollPane.setViewportView(modsList);
 
         modsPanel.setLeftComponent(modsScrollPane);
@@ -240,12 +251,9 @@ public class MainGUI extends javax.swing.JFrame {
         
         mainModsPanel.setLayout(new java.awt.BorderLayout());
 
-        
-
-
         mainModsPanel.add(modFormPanel, java.awt.BorderLayout.CENTER);
 
-        bottomModsPanel.setPreferredSize(new java.awt.Dimension(265, 24));
+        bottomModsPanel.setPreferredSize(new java.awt.Dimension(100, 24));
 
         
         modSaveBtn.setFont(DEFAULT_FONT); // NOI18N
@@ -261,7 +269,12 @@ public class MainGUI extends javax.swing.JFrame {
 
         modNewBtn.setFont(DEFAULT_FONT);
         modNewBtn.setText("New");
-
+        modNewBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                modNewBtnActionPerformed(evt);
+            }
+        });
+        
         javax.swing.GroupLayout bottomModsPanelLayout = new javax.swing.GroupLayout(bottomModsPanel);
         bottomModsPanel.setLayout(bottomModsPanelLayout);
         bottomModsPanelLayout.setHorizontalGroup(
@@ -287,6 +300,7 @@ public class MainGUI extends javax.swing.JFrame {
 
         mainModsPanel.add(bottomModsPanel, java.awt.BorderLayout.SOUTH);
 
+        mainModsPanel.setMinimumSize(new java.awt.Dimension(100, 0));
         modsPanel.setRightComponent(mainModsPanel);
         
 
@@ -299,9 +313,9 @@ public class MainGUI extends javax.swing.JFrame {
 
         pack();
         
-        mainPanel.setDividerLocation( (double)0.6); 
+        mainPanel.setDividerLocation( (double)0.5); 
         componentPanel.setDividerLocation( (double) 0.68 );
-        modsPanel.setDividerLocation( (double) 0.5);
+        modsPanel.setDividerLocation( (double) 0.2);
     }               
 
     private void createMenu() {
@@ -323,9 +337,7 @@ public class MainGUI extends javax.swing.JFrame {
         setJMenuBar(menuBar);
     }
     
-    private void modSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-    }                                          
+                                          
 
     /**
      * @param args the command line arguments
@@ -374,6 +386,17 @@ public class MainGUI extends javax.swing.JFrame {
         return moddedGearsList;
     }
     
+    public List<ModdedWeapon> getModdedWeapons() {
+        List<ModdedWeapon> moddedWeaponsList = new ArrayList<ModdedWeapon>();
+        HashMap<Integer,ModdedWeapon>  moddedWeaponsMap = backend.loadModdedWeapons(weaponTalents);
+        
+        for (Integer i : moddedWeaponsMap.keySet() ) {
+            moddedWeaponsList.add(moddedWeaponsMap.get(i));
+        }
+        
+        return moddedWeaponsList;
+    }
+    
     public List<Mod> getMods(String modType) {
         List<Mod> mods = new ArrayList<Mod>();
         HashMap<Integer,Mod>  modsMap = backend.loadMods(); // TODO: modtype??
@@ -386,34 +409,82 @@ public class MainGUI extends javax.swing.JFrame {
     }
     
     
+    
+    
+    public Persistable getBackend() {
+        return backend;
+    }
+    
     public GearSet[] getGearSetsList() {
         return gearSetsList;
+    }
+    
+    public WeaponTalent[] getWeaponTalentsList(boolean extended) {
+        return  (extended ? extendedWeaponTalentsList : weaponTalentsList);
     }
     
     public GearFormGUI getGearFormPanel() {
         return this.gearFormPanel;
     }
     
+    public WeaponFormGUI getWeaponFormPanel() {
+        return this.weaponFormPanel;
+    }
+    
+    
     public ModFormGUI getModFormPanel() {
         return this.modFormPanel;
+    }
+    
+    public FullBuildGUI getCurrentBuild() {
+        return (FullBuildGUI) this.jTabbedPanel.getSelectedComponent();
+    }
+    
+    public javax.swing.JButton getComponentSaveBtn() {
+        return this.componentSaveBtn;
+    }
+    
+    public javax.swing.JButton getModSaveBtn() {
+        return this.modSaveBtn;
     }
     
     public Property[] getPropertyList(int category) {
         return propertyListMap.get(category);
     }
     
+    public ModType[] getModFamiliesList(int category) {
+        return modPropertyListMap.get(category);
+    }
     
-    class ModList extends javax.swing.JList {
-        
-        ModList() {
-            
-            setModel(new javax.swing.AbstractListModel() {
+    public void addBuildTab(FullBuild fullBuild) {
+        FullBuildGUI fullBuildGUI = new FullBuildGUI(this,fullBuild);
+        fullbuilds.put( Integer.parseInt(fullBuild.getId()), fullBuild);
+        jTabbedPanel.addTab(fullBuild.getName(),fullBuildGUI );
+        jTabbedPanel.setSelectedComponent(fullBuildGUI);
+    }
+    
+    private javax.swing.AbstractListModel getModListModel() {
+        return new javax.swing.AbstractListModel() {
                 List<Mod> theMods =  getMods(null);
                 @Override
                 public int getSize() { return theMods.size(); }
                 @Override
                 public Mod getElementAt(int i) { return theMods.get(i); }
-            });
+            };
+    }
+    
+    
+    public void updateModList() {
+        this.modsList.setModel(getModListModel());
+    }
+    
+    public class ModList extends javax.swing.JList {
+        
+        
+        ModList() {
+            
+            setModel(getModListModel());
+            
             
             addMouseListener(new MouseAdapter() {
 
@@ -428,13 +499,38 @@ public class MainGUI extends javax.swing.JFrame {
                     
                     if (index >= 0) {
                         Mod theMod = (Mod) theList.getModel().getElementAt(index);
-                        //getGearFormPanel().updateModdedGear(Mod, gearType);
+                        modFormPanel.updateMod(theMod);
                     }
                 }
             });
+            
         }
+        
     }
     
+    
+    //private methods
+    private void componentSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // TODO add your handling code here:
+        //this.gearFormPanel.onBtnSaveActioned();
+        this.weaponFormPanel.onBtnSaveActioned();
+    }    
+    
+    private void modSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // TODO add your handling code here:
+        this.modFormPanel.onBtnSaveActioned();
+    }    
+    
+    private void modNewBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // TODO add your handling code here:
+        this.modFormPanel.clearMod();
+    }  
+    
+    private void componentNewBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // TODO add your handling code here:
+        //this.gearFormPanel.clearModdedGear();
+        this.weaponFormPanel.clearModdedWeapon();
+    }  
     
     // Variables declaration - do not modify                     
     private ModFormGUI modFormPanel;
@@ -475,9 +571,9 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JPanel topStatPanel;
     
     private FullBuildGUI defaultBuildTab;
-    private FullBuildGUI buildTab;
     
     private GearFormGUI gearFormPanel;
+    private WeaponFormGUI weaponFormPanel;
     
 
     

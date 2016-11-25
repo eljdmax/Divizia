@@ -180,6 +180,7 @@ public class SQLLite implements Persistable{
             gear.setFA(rs.getFloat("FA"));
             gear.setST(rs.getFloat("ST"));
             gear.setEL(rs.getFloat("EL"));
+            gear.setGearScore(rs.getInt("GEARSCORE"));
 
             fetchGearBonuses(gear);
             
@@ -228,9 +229,10 @@ public class SQLLite implements Persistable{
 
         if (gear.getId() == null) { //INSERT
 
-            query = "INSERT INTO GEAR (CLASS_TYPE, GEAR_SET_ID, ARMOR, FA, ST, EL) "
+            query = "INSERT INTO GEAR (CLASS_TYPE, GEAR_SET_ID, GEARSCORE, ARMOR, FA, ST, EL) "
                          + " VALUES ('"+ gearName +"',"
                          + "          "+ gear.getGearSet().getId()+","
+                         + "          "+ gear.getGearScore()+","
                          + "          "+ gear.getArmor()+","
                          + "          "+ gear.getFA()+","
                          + "          "+ gear.getST()+","
@@ -240,6 +242,7 @@ public class SQLLite implements Persistable{
 
             query = "UPDATE GEAR SET CLASS_TYPE = '"+ gearName +"',"
                     +             "   GEAR_SET_ID = "+ gear.getGearSet().getId() + ","
+                    +             "   GEARSCORE = "+ gear.getGearScore()+ ","
                     +             "   ARMOR = "+ gear.getArmor() + ","
                     +             "   FA = "+ gear.getFA() + ","
                     +             "   ST = "+ gear.getST() + ","
@@ -585,7 +588,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            String query = "SELECT m.rowid, m.* FROM MODS m JOIN MODDED_GEAR_MODS mgm ON m.rowid = mgm.MOD_ID "
+            String query = "SELECT m.rowid, mgm.MOD_POSITION, m.* FROM MODS m JOIN MODDED_GEAR_MODS mgm ON m.rowid = mgm.MOD_ID "
                     + "                         WHERE mgm.MODDED_GEAR_ID = "+moddedGear.getId();
 
 
@@ -601,7 +604,7 @@ public class SQLLite implements Persistable{
 
                 fetchModBonuses(mod);
                 
-                moddedGear.addMod(mod);
+                moddedGear.addMod(mod, RecalibrationPosition.valueOf(rs.getString("MOD_POSITION")));
             }
 
             rs.close();
@@ -734,6 +737,9 @@ public class SQLLite implements Persistable{
     private void saveOrUpdateModdedGear(ModdedGear moddedGear, Statement stmt) throws Exception {
 
         // Gear first
+        if (moddedGear == null) {
+            return;
+        }
         
         saveOrUpdateGear(moddedGear.getGear(), stmt);
         
@@ -761,9 +767,11 @@ public class SQLLite implements Persistable{
         //Bonuses
         stmt.executeUpdate("DELETE FROM MODDED_GEAR_MODS WHERE MODDED_GEAR_ID = "+moddedGear.getId());
         
+        HashMap<GearMod,RecalibrationPosition> modsPosition = moddedGear.getModsPosition();
+        
         for (GearMod mod : moddedGear.getMods()) {
             saveOrUpdateMod(mod,stmt);
-            stmt.executeUpdate("INSERT INTO MODDED_GEAR_MODS ( MODDED_GEAR_ID , MOD_ID) VALUES ( "+moddedGear.getId()+","+ mod.getId() +" )"  );
+            stmt.executeUpdate("INSERT INTO MODDED_GEAR_MODS ( MODDED_GEAR_ID , MOD_ID, MOD_POSITION) VALUES ( "+moddedGear.getId()+","+ mod.getId() +",'"+ modsPosition.get(mod).name() +"')"  );
         }
              
     }
@@ -798,46 +806,31 @@ public class SQLLite implements Persistable{
     }
     
     
-    private HashMap<Integer,WeaponTalent> loadWeaponTalents(String weaponTalentId, Statement stmt) throws Exception {
-        HashMap<Integer,WeaponTalent> ret = new HashMap<Integer,WeaponTalent>();
-        
-        String query = "SELECT rowid, * FROM WEAPON_TALENT ";
-        if (weaponTalentId != null) {
-            query += " WHERE rowid = "+weaponTalentId;
-        }
-
-        ResultSet rs = stmt.executeQuery(query);
-        
-        WeaponTalent weaponTalent;
-        while (rs.next()) {
-
-            weaponTalent = (WeaponTalent) Class.forName("core.components.weapontalents."+rs.getString("CLASS_TYPE")).newInstance();
-
-            weaponTalent.setId(Integer.toString(rs.getInt("rowid")));
-            weaponTalent.setValue1(rs.getFloat("VALUE_1"));
-            weaponTalent.setValue2(rs.getFloat("VALUE_2"));
-            
-            ret.put(rs.getInt("rowid"), weaponTalent );
-        }
-
-        rs.close();   
-        
-        return ret;
-    }
-    
-    
     @Override
-    public HashMap<Integer,WeaponTalent> loadWeaponTalents() {
-        HashMap<Integer,WeaponTalent> ret = null;
+    public HashMap<Integer,WeaponTalent> loadWeaponTalents(HashMap<String,WeaponTalent> innerMap) {
+        
+        HashMap<Integer,WeaponTalent> ret = new HashMap<Integer,WeaponTalent>();
         
         Connection c = null;
         try {
             c = getConnection();
             
+            String query = "SELECT rowid,* FROM WEAPON_TALENT";
+            
             Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            WeaponTalent weaponTalent;
+            while (rs.next()) {
+                weaponTalent = innerMap.get(rs.getString("NAME"));
+                if (weaponTalent == null) {
+                    continue;
+                }
+                weaponTalent.setId(Integer.toString(rs.getInt("rowid")));
+                ret.put(rs.getInt("rowid"), weaponTalent );
+                
+            }
             
-            ret = loadWeaponTalents(null,stmt);
-            
+            rs.close();
             stmt.close();
         } catch (Exception ex) {
             System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
@@ -852,65 +845,6 @@ public class SQLLite implements Persistable{
         }
         
         return ret;
-    }
-    
-    
-    private void saveOrUpdateWeaponTalent(WeaponTalent weaponTalent, Statement stmt) throws Exception {
-        String[] parts = weaponTalent.getClass().getName().split("\\.");
-        String weaponTalentName = parts[ parts.length - 1];
-        String query;
-
-        if (weaponTalent.getId() == null) { //INSERT
-
-            query = "INSERT INTO WEAPON_TALENT (CLASS_TYPE, VALUE_1, VALUE_2) "
-                         + " VALUES ('"+ weaponTalentName +"',"
-                         + "          "+ weaponTalent.getValue1()+","
-                         + "          "+ weaponTalent.getValue2()+")";
-
-        } else { //UPDATE
-
-            query = "UPDATE WEAPON_TALENT SET CLASS_TYPE = '"+ weaponTalentName +"',"
-                    +             "   VALUE_1 =  "+ weaponTalent.getValue1() + ","
-                    +             "   VALUE_2 =  "+ weaponTalent.getValue2() 
-                    + "   WHERE rowid = "+ weaponTalent.getId();
-
-        }
-
-        stmt.executeUpdate(query);
-
-        if (weaponTalent.getId() == null) {
-            weaponTalent.setId(Long.toString(getInsertedId(stmt)));
-        }
-             
-    }
-    
-    @Override
-    public void saveOrUpdateWeaponTalent(WeaponTalent weaponTalent) {
-        
-        Connection c = null;
-        
-        try {
-            c = getConnection(); 
-            c.setAutoCommit(false);
-            
-            Statement stmt = c.createStatement();
-            
-            saveOrUpdateWeaponTalent(weaponTalent, stmt);
-            
-            c.commit();
-            stmt.close();
-            
-        } catch (Exception ex) {
-            System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
-        } finally {
-            try {
-                if (c != null && !c.isClosed() ) { 
-                    c.close();
-                }
-            } catch (Exception ex) {
-                System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
-            }
-        }
     }
     
     private PropValue fetchPropValue(String propValueId) {
@@ -950,44 +884,8 @@ public class SQLLite implements Persistable{
         return propValue;
     }
     
-    private WeaponTalent fetchWeaponTalent(String weaponTalentId) {
-        
-        if (weaponTalentId == null) {
-            return null;
-        }
-        
-        WeaponTalent weaponTalent = null;
-        
-        Connection c = null;
-        try { 
-            c = getConnection();
-            
-            Statement stmt = c.createStatement();
-            
-            HashMap<Integer,WeaponTalent> mappedWeaponTalent = loadWeaponTalents(weaponTalentId, stmt);
-            
-            for (Integer i : mappedWeaponTalent.keySet() ){
-                weaponTalent = mappedWeaponTalent.get(i);
-                break;
-            }
-            
-            stmt.close();
-        } catch (Exception ex) {
-            System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
-        } finally {
-            try {
-                if (c != null && !c.isClosed() ) {
-                    c.close();
-                }
-            } catch (Exception ex) {
-                System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
-            }
-        }
-        
-        return weaponTalent;
-    }
     
-    private void fetchWeaponExtraTalents(Weapon weapon) {
+    private void fetchWeaponExtraTalents(Weapon weapon,HashMap<Integer,WeaponTalent> weaponTalents) {
         
         if (weapon.getId() == null) {
             return;
@@ -1009,11 +907,7 @@ public class SQLLite implements Persistable{
             
             while (rs.next()) {
                 
-                weaponTalent = (WeaponTalent) Class.forName("core.components.weapontalents."+rs.getString("CLASS_TYPE")).newInstance();
-
-                weaponTalent.setId(Integer.toString(rs.getInt("rowid")));
-                weaponTalent.setValue1(rs.getFloat("VALUE_1"));
-                weaponTalent.setValue2(rs.getFloat("VALUE_2"));
+                weaponTalent =  weaponTalents.get(rs.getInt("rowid")); 
                 
                 weapon.addTalent(weaponTalent);
             }
@@ -1034,7 +928,7 @@ public class SQLLite implements Persistable{
         
     }
     
-    private HashMap<Integer,Weapon> loadWeapons(String weaponId, Statement stmt) throws Exception {
+    private HashMap<Integer,Weapon> loadWeapons(HashMap<Integer,WeaponTalent> weaponTalents, String weaponId, Statement stmt) throws Exception {
         HashMap<Integer,Weapon> ret = new HashMap<Integer,Weapon>();
         
         String query = "SELECT rowid, * FROM WEAPON ";
@@ -1050,15 +944,17 @@ public class SQLLite implements Persistable{
         
         while (rs.next()) {
 
-            mainTalent = fetchWeaponTalent( Long.toString(rs.getLong("MAIN_TALENT_ID")) );
+            mainTalent = weaponTalents.get(rs.getInt("MAIN_TALENT_ID"));
             
             bonus = fetchPropValue( Long.toString(rs.getLong("BONUS_ID")) );
                     
             weapon = new Weapon( WeaponType.valueOf(rs.getString("TYPE")), rs.getFloat("BASE_DMG"), mainTalent, bonus );
 
+            weapon.setGearScore(rs.getInt("GEAR_SCORE"));
+            
             weapon.setId(Integer.toString(rs.getInt("rowid")));
             
-            fetchWeaponExtraTalents(weapon);
+            fetchWeaponExtraTalents(weapon,weaponTalents);
             
             ret.put(rs.getInt("rowid"), weapon );
         }
@@ -1070,7 +966,7 @@ public class SQLLite implements Persistable{
     
     
     @Override
-    public HashMap<Integer,Weapon> loadWeapons() {
+    public HashMap<Integer,Weapon> loadWeapons(HashMap<Integer,WeaponTalent> weaponTalents) {
         HashMap<Integer,Weapon> ret = null;
         
         Connection c = null;
@@ -1079,7 +975,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            ret = loadWeapons(null,stmt);
+            ret = loadWeapons(weaponTalents,null,stmt);
             
             stmt.close();
         } catch (Exception ex) {
@@ -1099,9 +995,6 @@ public class SQLLite implements Persistable{
     
     private void saveOrUpdateWeapon(Weapon weapon, Statement stmt) throws Exception {
 
-        // Weapon Talent, Bonus first
-        saveOrUpdateWeaponTalent(weapon.getMainTalent(), stmt);
-
         
         String bonusId = "''";
         if (weapon.getWeaponBonus() != null) {
@@ -1113,12 +1006,13 @@ public class SQLLite implements Persistable{
         
         if (weapon.getId() == null) { //INSERT
 
-            query = "INSERT INTO WEAPON (`TYPE`, BONUS_ID, BASE_DMG, MAIN_TALENT_ID) "
-                         + " VALUES ('"+ weapon.getWeaponType().name()+"', "+ bonusId +", "+ weapon.getBaseDamage() +", " + weapon.getMainTalent().getId() + ")";
+            query = "INSERT INTO WEAPON (`TYPE`, GEAR_SCORE, BONUS_ID, BASE_DMG, MAIN_TALENT_ID) "
+                         + " VALUES ('"+ weapon.getWeaponType().name()+"',"+weapon.getGearScore()+", "+ bonusId +", "+ weapon.getBaseDamage() +", " + weapon.getMainTalent().getId() + ")";
 
         } else { //UPDATE
 
             query = "UPDATE WEAPON SET `TYPE` = '"+ weapon.getWeaponType().name() +"', "
+                    + "                      GEAR_SCORE = "+ weapon.getGearScore() + ", "
                     + "                      BONUS_ID = "+ bonusId + ", "
                     + "                      BASE_DMG = "+ weapon.getBaseDamage() + ", "
                     + "                      MAIN_TALENT_ID = "+ weapon.getMainTalent().getId() 
@@ -1136,7 +1030,6 @@ public class SQLLite implements Persistable{
         stmt.executeUpdate("DELETE FROM WEAPON_EXTRA_TALENTS WHERE WEAPON_ID = "+weapon.getId());
         
         for (WeaponTalent weaponTalent : weapon.getExtraTalents()) {
-            saveOrUpdateWeaponTalent(weaponTalent,stmt);
             stmt.executeUpdate("INSERT INTO WEAPON_EXTRA_TALENTS ( WEAPON_ID , WEAPON_TALENT_ID) "
                               +"       VALUES ( "+weapon.getId()+","+ weaponTalent.getId() +" )"  );
         }
@@ -1184,7 +1077,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            String query = "SELECT m.rowid, m.* FROM MODS m JOIN MODDED_WEAPON_MODS mwm ON m.rowid = mwm.MOD_ID "
+            String query = "SELECT m.rowid, mwm.MOD_POSITION, m.* FROM MODS m JOIN MODDED_WEAPON_MODS mwm ON m.rowid = mwm.MOD_ID "
                     + "                         WHERE mwm.MODDED_WEAPON_ID = "+moddedWeapon.getId();
 
 
@@ -1200,7 +1093,7 @@ public class SQLLite implements Persistable{
 
                 fetchModBonuses(mod);
                 
-                moddedWeapon.addMod(mod);
+                moddedWeapon.addMod(mod, ModType.valueOf(rs.getString("MOD_POSITION")));
             }
 
             rs.close();
@@ -1219,7 +1112,7 @@ public class SQLLite implements Persistable{
         
     }
     
-    private Weapon fetchWeapon(String weaponId) {
+    private Weapon fetchWeapon(HashMap<Integer,WeaponTalent> weaponTalents, String weaponId) {
         
         if (weaponId == null) {
             return null;
@@ -1233,7 +1126,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            HashMap<Integer,Weapon> mappedWeapon = loadWeapons(weaponId, stmt);
+            HashMap<Integer,Weapon> mappedWeapon = loadWeapons(weaponTalents, weaponId, stmt);
             
             for (Integer i : mappedWeapon.keySet() ){
                 weapon = mappedWeapon.get(i);
@@ -1257,7 +1150,7 @@ public class SQLLite implements Persistable{
     }
     
     
-    private HashMap<Integer,ModdedWeapon> loadModdedWeapons(String moddedWeaponId, Statement stmt) throws Exception {
+    private HashMap<Integer,ModdedWeapon> loadModdedWeapons(HashMap<Integer,WeaponTalent> weaponTalents, String moddedWeaponId, Statement stmt) throws Exception {
         HashMap<Integer,ModdedWeapon> ret = new HashMap<Integer,ModdedWeapon>();
         
         String query = "SELECT rowid, * FROM MODDED_WEAPON ";
@@ -1274,7 +1167,7 @@ public class SQLLite implements Persistable{
             moddedWeapon = new ModdedWeapon();
             moddedWeapon.setId(Integer.toString(rs.getInt("rowid")));
 
-            weapon =fetchWeapon(Long.toString(rs.getLong("WEAPON_ID")));
+            weapon =fetchWeapon(weaponTalents, Long.toString(rs.getLong("WEAPON_ID")));
             
             if (weapon !=null) {
                 moddedWeapon.setWeapon(weapon);
@@ -1291,7 +1184,7 @@ public class SQLLite implements Persistable{
     }
     
     @Override
-    public HashMap<Integer,ModdedWeapon> loadModdedWeapons() {
+    public HashMap<Integer,ModdedWeapon> loadModdedWeapons(HashMap<Integer,WeaponTalent> weaponTalents) {
         HashMap<Integer,ModdedWeapon> ret = null;
         
         Connection c = null;
@@ -1300,7 +1193,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            ret = loadModdedWeapons(null,stmt);
+            ret = loadModdedWeapons(weaponTalents,null,stmt);
             
             stmt.close();
         } catch (Exception ex) {
@@ -1321,6 +1214,9 @@ public class SQLLite implements Persistable{
     private void saveOrUpdateModdedWeapon(ModdedWeapon moddedWeapon, Statement stmt) throws Exception {
 
         // Weapon first
+        if (moddedWeapon == null) {
+            return;
+        }
         
         saveOrUpdateWeapon(moddedWeapon.getWeapon(), stmt);
         
@@ -1348,9 +1244,11 @@ public class SQLLite implements Persistable{
         //Bonuses
         stmt.executeUpdate("DELETE FROM MODDED_WEAPON_MODS WHERE MODDED_WEAPON_ID = "+moddedWeapon.getId());
         
+        HashMap<WeaponMod,ModType> modsPosition = moddedWeapon.getModsPosition();
+        
         for (WeaponMod mod : moddedWeapon.getMods()) {
             saveOrUpdateMod(mod,stmt);
-            stmt.executeUpdate("INSERT INTO MODDED_WEAPON_MODS ( MODDED_WEAPON_ID , MOD_ID) VALUES ( "+moddedWeapon.getId()+","+ mod.getId() +" )"  );
+            stmt.executeUpdate("INSERT INTO MODDED_WEAPON_MODS ( MODDED_WEAPON_ID , MOD_ID, MOD_POSITION) VALUES ( "+moddedWeapon.getId()+","+ mod.getId() +",'"+ modsPosition.get(mod).name() +"')"  );
         }
              
     }
@@ -1372,6 +1270,7 @@ public class SQLLite implements Persistable{
             stmt.close();
             
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
         } finally {
             try {
@@ -1421,7 +1320,7 @@ public class SQLLite implements Persistable{
         return moddedGear;
     }
     
-    private ModdedWeapon fetchModdedWeapon(String moddedWeaponId) {
+    private ModdedWeapon fetchModdedWeapon(HashMap<Integer,WeaponTalent> weaponTalents, String moddedWeaponId) {
         
         if (moddedWeaponId == null) {
             return null;
@@ -1435,7 +1334,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            HashMap<Integer,ModdedWeapon> mappedModdedWeapon = loadModdedWeapons( moddedWeaponId, stmt);
+            HashMap<Integer,ModdedWeapon> mappedModdedWeapon = loadModdedWeapons( weaponTalents, moddedWeaponId, stmt);
             
             for (Integer i : mappedModdedWeapon.keySet() ){
                 moddedWeapon = mappedModdedWeapon.get(i);
@@ -1458,7 +1357,7 @@ public class SQLLite implements Persistable{
         return moddedWeapon;
     }
     
-    private HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets, String fullBuildId, Statement stmt) throws Exception {
+    private HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets, HashMap<Integer,WeaponTalent> weaponTalents, String fullBuildId, Statement stmt) throws Exception {
         HashMap<Integer,FullBuild> ret = new HashMap<Integer,FullBuild>();
         
         String query = "SELECT rowid, * FROM BUILD ";
@@ -1489,13 +1388,13 @@ public class SQLLite implements Persistable{
             fullBuild = new FullBuild(rs.getString("NAME"), backPack, bodyArmor, gloves, holster, kneePads, mask);
             fullBuild.setId(Integer.toString(rs.getInt("rowid")));
 
-            weapon1 = fetchModdedWeapon(Long.toString(rs.getLong("WEAPON_1_ID")));
+            weapon1 = fetchModdedWeapon(weaponTalents, Long.toString(rs.getLong("WEAPON_1_ID")));
             
             if (weapon1 !=null) {
                 fullBuild.setWeapon1(weapon1);
             }
             
-            weapon2 = fetchModdedWeapon(Long.toString(rs.getLong("WEAPON_2_ID")));
+            weapon2 = fetchModdedWeapon(weaponTalents, Long.toString(rs.getLong("WEAPON_2_ID")));
             
             if (weapon2 !=null) {
                 fullBuild.setWeapon2(weapon1);
@@ -1510,7 +1409,7 @@ public class SQLLite implements Persistable{
     }
     
     @Override
-    public HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets) {
+    public HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets, HashMap<Integer,WeaponTalent> weaponTalents) {
         HashMap<Integer,FullBuild> ret = null;
         
         Connection c = null;
@@ -1519,7 +1418,7 @@ public class SQLLite implements Persistable{
             
             Statement stmt = c.createStatement();
             
-            ret = loadFullBuilds(gearSets,null,stmt);
+            ret = loadFullBuilds(gearSets,weaponTalents,null,stmt);
             
             stmt.close();
         } catch (Exception ex) {

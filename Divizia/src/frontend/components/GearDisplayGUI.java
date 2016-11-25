@@ -29,8 +29,7 @@ public class GearDisplayGUI extends javax.swing.JPanel {
     
     private void initComponents() {
         
-        selectedGearPanel = new SelectedGearPanel();
-        gearLabel = new javax.swing.JLabel();
+        selectedGearPanel = new SelectedGearPanel(this);
         scrollPane = new javax.swing.JScrollPane();
         gearList = new GearList();
         
@@ -40,17 +39,13 @@ public class GearDisplayGUI extends javax.swing.JPanel {
         this.setBorder(titledBorder);
         this.setLayout(new java.awt.GridLayout(0, 2));
 
-        selectedGearPanel.setLayout(new java.awt.BorderLayout());
-        if (this.moddedGear != null) {
-            gearLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            gearLabel.setFont(MainGUI.DEFAULT_FONT);
-            gearLabel.setText(this.moddedGear.displayText());
-            selectedGearPanel.add(gearLabel);
-        } 
         
+        selectedGearPanel.setTransferHandler(new ModdedGearListTransferHandler());
         this.add(selectedGearPanel,java.awt.BorderLayout.CENTER);
 
         gearList.setFont(MainGUI.DEFAULT_FONT);
+        gearList.setDragEnabled(true);
+        gearList.setTransferHandler(new ModdedGearListTransferHandler());
         
         scrollPane.setViewportView(gearList);
 
@@ -58,39 +53,47 @@ public class GearDisplayGUI extends javax.swing.JPanel {
 
     }
     
+    public void refresh() {
+
+        this.selectedGearPanel.refresh();
+        this.gearList.setModel(getGearListModel());
+        
+    }
+    
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JLabel gearLabel;
     private GearList gearList;
     private SelectedGearPanel selectedGearPanel;
 
-    class SelectedGearPanel extends javax.swing.JPanel {
-        
-        SelectedGearPanel() {
-            addMouseListener(new MouseAdapter() {
+    public MainGUI getMainGUI() {
+        return mainGUI;
+    }
 
-                @Override
-                public void mousePressed(MouseEvent e) {
-                }
+    public ModdedGear getModdedGear() {
+        return moddedGear;
+    }
 
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    if (moddedGear != null) {
-                        mainGUI.getGearFormPanel().updateModdedGear(moddedGear, gearType);
-                    }
-                }
-            });
-        }
+    public String getGearType() {
+        return gearType;
+    }
+
+    public void updateModdedGear(ModdedGear moddedGear) {
+        this.moddedGear = moddedGear;
+        this.selectedGearPanel.refresh();
     }
     
-    class GearList extends javax.swing.JList {
-        
-        GearList() {
-            
-            setModel(new javax.swing.AbstractListModel() {
+    private javax.swing.AbstractListModel getGearListModel() {
+        return new javax.swing.AbstractListModel() {
                 List<ModdedGear> moddedGears =  mainGUI.getModdedGears(gearType);
                 public int getSize() { return moddedGears.size(); }
                 public Object getElementAt(int i) { return moddedGears.get(i); }
-            });
+            };
+    }
+    
+    public class GearList extends javax.swing.JList {
+        
+        GearList() {
+            
+            setModel(getGearListModel());
             
             addMouseListener(new MouseAdapter() {
 

@@ -26,7 +26,7 @@ public class Test {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
+        /*
         HashMap<String,GearSet> innerMap = new HashMap<String,GearSet>();
         innerMap.put(HunterFaith.getInstance().getName(), HunterFaith.getInstance());
         innerMap.put(Reclaimer.getInstance().getName(), Reclaimer.getInstance());

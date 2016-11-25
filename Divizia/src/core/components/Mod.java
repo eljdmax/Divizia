@@ -40,7 +40,14 @@ public abstract class Mod {
         this.id = id;
     }
     
+    public void clearBonus() {
+        this.bonus.clear();
+    }
+    
     public void addBonus(PropValue prop){
+        if (prop == null) {
+            return;
+        }
         bonus.add(prop);
     }
     

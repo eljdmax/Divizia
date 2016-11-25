@@ -10,8 +10,10 @@ import core.components.Gear;
 import core.components.GearMod;
 import core.components.PropValue;
 import core.components.Property;
+import core.components.RecalibrationPosition;
 import core.components.Stats;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -23,27 +25,43 @@ public class ModdedGear {
     
     private Gear gear;
     private List<GearMod> mods;
+    private HashMap<GearMod,RecalibrationPosition> modsPosition;
     
     private Stats fullStats;
     
     public ModdedGear() {
-        mods = new ArrayList<GearMod>() ;
+        this(null);
     }
     
     public ModdedGear(Gear gear) {
         this.gear = gear;
-        
-        this.fullStats = new Stats(gear.getFullStats());
-        
+        if (gear != null) {
+            this.fullStats = new Stats(gear.getFullStats());
+        }else {
+            this.fullStats = new Stats();
+        }
         mods = new ArrayList<GearMod>() ;
+        modsPosition = new HashMap<GearMod,RecalibrationPosition>() ;
     }
     
-    public void addMod(GearMod gearMod) {
+    public void clearMods() {
+        for (GearMod gearMod : mods) {
+            for (PropValue prop : gearMod.getBonus()) {
+                fullStats.removeBonus(prop);
+            }
+        }
+        
+        modsPosition.clear();
+        mods.clear();
+    }
+    
+    public void addMod(GearMod gearMod,RecalibrationPosition pos) {
         //safeguard!!
         mods.add(gearMod);
         for (PropValue prop : gearMod.getBonus()) {
             fullStats.addBonus(prop);
         }
+        modsPosition.put(gearMod,pos);
         //it's affect stats
     }
     
@@ -53,6 +71,7 @@ public class ModdedGear {
             for (PropValue prop : gearMod.getBonus()) {
                 fullStats.removeBonus(prop);
             }
+            modsPosition.remove(gearMod);
             return true;
         }
         
@@ -72,8 +91,11 @@ public class ModdedGear {
     }
     
     public void setGear(Gear gear) {
+        if (this.gear != null) {
+            this.fullStats.subStats(this.gear.getFullStats());
+        }
         this.gear = gear;
-        this.fullStats = new Stats(gear.getFullStats());
+        this.fullStats.mergeStats(gear.getFullStats());
     }
 
     public List<GearMod> getMods() {
@@ -83,7 +105,10 @@ public class ModdedGear {
     public Stats getFullStats() {
         return fullStats;
     }
-    
+
+    public HashMap<GearMod, RecalibrationPosition> getModsPosition() {
+        return modsPosition;
+    }
     
     
     @Override

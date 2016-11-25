@@ -22,18 +22,19 @@ public interface Persistable {
     public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets);
     public HashMap<Integer,ModdedGear> loadModdedGears(HashMap<Integer,GearSet> gearSets, String gearType);
     
-    public HashMap<Integer,WeaponTalent> loadWeaponTalents();
-    public HashMap<Integer,Weapon> loadWeapons();
-    public HashMap<Integer,ModdedWeapon> loadModdedWeapons();
-    public HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets);
+    public HashMap<Integer,WeaponTalent> loadWeaponTalents(HashMap<String,WeaponTalent> innerMap);
+    public HashMap<Integer,Weapon> loadWeapons(HashMap<Integer,WeaponTalent> weaponTalents);
+    public HashMap<Integer,ModdedWeapon> loadModdedWeapons(HashMap<Integer,WeaponTalent> weaponTalents);
+    public HashMap<Integer,FullBuild> loadFullBuilds(HashMap<Integer,GearSet> gearSets, HashMap<Integer,WeaponTalent> weaponTalents);
     
     public void saveOrUpdateGear(Gear gear);
     public void saveOrUpdatePropValue(PropValue prop);
     public void saveOrUpdateMod(Mod mod);
     public void saveOrUpdateModdedGear(ModdedGear moddedGear);
-    public void saveOrUpdateWeaponTalent(WeaponTalent weaponTalent);
     public void saveOrUpdateWeapon(Weapon weapon);
     public void saveOrUpdateModdedWeapon(ModdedWeapon moddedWeapon);
     public void saveOrUpdateFullBuild(FullBuild fullBuild);
+    
+    //TODO: Delete interface
     
 }

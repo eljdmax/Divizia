@@ -26,6 +26,8 @@ public abstract class Gear {
     protected Float ST = null;
     protected Float EL = null;
     
+    protected int gearScore =  0;
+    
     
     protected Stats baseStats;
 
@@ -68,9 +70,19 @@ public abstract class Gear {
     }
     
     
+    
+    public void clearBonuses() {
+        for(PropValue bonus : baseBonuses) {
+            fullStats.removeBonus(bonus);
+        }
+        baseBonuses.clear();
+    }
     //public boolean canfit(Gear gear);
     
     public void addBonus(PropValue bonus) {
+        if (bonus == null) {
+            return;
+        }
         fullStats.addBonus(bonus);
         this.baseBonuses.add(bonus);
     }
@@ -194,6 +206,14 @@ public abstract class Gear {
 
     public Stats getFullStats() {
         return fullStats;
+    }
+
+    public int getGearScore() {
+        return gearScore;
+    }
+
+    public void setGearScore(int gearScore) {
+        this.gearScore = gearScore;
     }
     
     
