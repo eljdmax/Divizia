@@ -1,21 +1,9 @@
 package frontend.components;
 
-import core.components.Mod;
 import core.components.ModType;
-import core.components.PropValue;
-import core.components.Property;
-import core.components.RecalibrationPosition;
 import core.components.WeaponMod;
 import core.utils.Constants;
 import frontend.main.MainGUI;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -72,7 +60,7 @@ public class WeaponModGUI extends javax.swing.JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (mod != null) {
-                        mainGUI.getModFormPanel().updateMod(mod);
+                        mainGUI.setSelectedModList(mod);
                     }
                 }
             });
@@ -108,7 +96,7 @@ public class WeaponModGUI extends javax.swing.JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (mod != null) {
-                        mainGUI.getModFormPanel().updateMod(mod);
+                        mainGUI.setSelectedModList(mod);
                     }
                 }
             });
@@ -124,9 +112,12 @@ public class WeaponModGUI extends javax.swing.JPanel {
         return mod;
     }
     
-    public boolean canReceiveMod() {
+    public boolean canReceiveMod(WeaponMod weaponMod) {
+        if (weaponMod == null) {
+            return false;
+        }
         //return (propertyComboBox.getSelectedItem() == null || ((Property) propertyComboBox.getSelectedItem()) == Property.EMPTY  );
-        return editable; //&& modType is correct
+        return editable && (modType == weaponMod.getType());
     }
     
     public void updateWeaponMod(WeaponMod mod) {
@@ -142,11 +133,14 @@ public class WeaponModGUI extends javax.swing.JPanel {
     
     private void updateLayout() {
         
-        modText.setText("");
-        if (mod != null) {
-            modText.setText(mod.toString());
+        if (editable) {
+            modText.setText("");
+            if (mod != null) {
+                modText.setText(mod.getName());
+            }
+        } else {
+            modLabel.setText(mod.getName());
         }
-             
     }
     
   

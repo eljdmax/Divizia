@@ -10,22 +10,16 @@ import backend.Persistable;
 import backend.dbs.SQLLite;
 import core.build.*;
 import core.components.*;
-import core.components.gearsets.*;
 import core.utils.Constants;
 import frontend.components.*;
-import java.awt.Component;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -133,8 +127,12 @@ public class MainGUI extends javax.swing.JFrame {
         modDeleteBtn = new javax.swing.JButton();
         modNewBtn = new javax.swing.JButton();
         
+        componentFormPanel = new javax.swing.JPanel();
+        componentCardLayout = new java.awt.CardLayout();
         
-        
+        btnGroup = new javax.swing.ButtonGroup();
+        gearFormBtn = new javax.swing.JRadioButton();
+        weaponFormBtn = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(WIDTH, HEIGHT));
@@ -162,6 +160,12 @@ public class MainGUI extends javax.swing.JFrame {
             buildTab = new FullBuildGUI(this,fullBuild);
             jTabbedPanel.addTab(fullBuild.getName(), buildTab);
         }
+        jTabbedPanel.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent e) {
+                ((FullBuildGUI) jTabbedPanel.getSelectedComponent()).refresh("All");
+            }
+        });
+        
 
         buildsPanel.add(jTabbedPanel, java.awt.BorderLayout.CENTER);
 
@@ -170,7 +174,7 @@ public class MainGUI extends javax.swing.JFrame {
         
         componentPanel.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        moddedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modded Component"));
+        moddedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modded Gear"));
         moddedPanel.setLayout(new java.awt.BorderLayout());
 
         moddedTopPanel.setPreferredSize(new java.awt.Dimension(WIDTH, 20));
@@ -180,14 +184,37 @@ public class MainGUI extends javax.swing.JFrame {
 
         moddedMainPanel.setLayout(new java.awt.BorderLayout());
 
+        componentFormPanel.setLayout(componentCardLayout);
+        componentFormPanel.add(gearFormPanel, "Gear");
+        componentFormPanel.add(weaponFormPanel, "Weapon");
         // moddedMainPanel.add(gearFormPanel, java.awt.BorderLayout.CENTER);
 
-        moddedMainPanel.add(weaponFormPanel, java.awt.BorderLayout.CENTER);
+        moddedMainPanel.add(componentFormPanel, java.awt.BorderLayout.CENTER);
         
         moddedPanel.add(moddedMainPanel, java.awt.BorderLayout.CENTER);
 
         moddedBottomPanel.setPreferredSize(new java.awt.Dimension(365, 24));
 
+        
+        gearFormBtn.setFont(DEFAULT_FONT);
+        gearFormBtn.setText("Gear");
+        gearFormBtn.setSelected(true);
+        gearFormBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                componentBtnActionPerformed(evt, "Gear");
+            }
+        });
+        btnGroup.add(gearFormBtn);
+        
+        weaponFormBtn.setFont(DEFAULT_FONT);
+        weaponFormBtn.setText("Weapon");
+        weaponFormBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                componentBtnActionPerformed(evt, "Weapon");
+            }
+        });
+        btnGroup.add(weaponFormBtn);
+        
         componentSaveBtn.setFont(DEFAULT_FONT); // NOI18N
         componentSaveBtn.setText("Save");
         componentSaveBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -212,7 +239,11 @@ public class MainGUI extends javax.swing.JFrame {
         moddedBottomPanelLayout.setHorizontalGroup(
             moddedBottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, moddedBottomPanelLayout.createSequentialGroup()
-                .addContainerGap(269, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(gearFormBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(weaponFormBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
                 .addComponent(componentnewBtn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(componentDeleteBtn)
@@ -227,7 +258,9 @@ public class MainGUI extends javax.swing.JFrame {
                 .addGroup(moddedBottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(componentSaveBtn)
                     .addComponent(componentDeleteBtn)
-                    .addComponent(componentnewBtn)))
+                    .addComponent(componentnewBtn)
+                    .addComponent(gearFormBtn)
+                    .addComponent(weaponFormBtn)))
         );
 
         moddedPanel.add(moddedBottomPanel, java.awt.BorderLayout.SOUTH);
@@ -423,11 +456,19 @@ public class MainGUI extends javax.swing.JFrame {
         return  (extended ? extendedWeaponTalentsList : weaponTalentsList);
     }
     
-    public GearFormGUI getGearFormPanel() {
+    public GearFormGUI getGearFormPanel(boolean switchTo) {
+        if (switchTo){
+            this.gearFormBtn.setSelected(true);
+            componentBtnActionPerformed(null, "Gear");
+        }
         return this.gearFormPanel;
     }
     
-    public WeaponFormGUI getWeaponFormPanel() {
+    public WeaponFormGUI getWeaponFormPanel(boolean switchTo) {
+        if (switchTo){
+            this.weaponFormBtn.setSelected(true);
+            componentBtnActionPerformed(null, "Weapon");
+        }
         return this.weaponFormPanel;
     }
     
@@ -464,15 +505,23 @@ public class MainGUI extends javax.swing.JFrame {
     }
     
     private javax.swing.AbstractListModel getModListModel() {
-        return new javax.swing.AbstractListModel() {
+        javax.swing.AbstractListModel model = new javax.swing.AbstractListModel() {
                 List<Mod> theMods =  getMods(null);
                 @Override
                 public int getSize() { return theMods.size(); }
                 @Override
                 public Mod getElementAt(int i) { return theMods.get(i); }
+                
             };
+        
+        return model;
     }
     
+    
+    public void setSelectedModList(Mod mod) {
+        this.modsList.setSelectedValue(mod, true);
+        this.modFormPanel.updateMod(mod);
+    }
     
     public void updateModList() {
         this.modsList.setModel(getModListModel());
@@ -485,52 +534,58 @@ public class MainGUI extends javax.swing.JFrame {
             
             setModel(getModListModel());
             
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
-            addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    javax.swing.JList theList = (javax.swing.JList) e.getSource();
-                    int index = theList.locationToIndex(e.getPoint());
-                    
-                    if (index >= 0) {
-                        Mod theMod = (Mod) theList.getModel().getElementAt(index);
-                        modFormPanel.updateMod(theMod);
-                    }
+            getSelectionModel().addListSelectionListener(new SharedListSelectionHandler(this) {
+                public void onValueChanged(Object object){
+                    modFormPanel.updateMod((Mod) object);
                 }
             });
-            
+                     
         }
         
     }
     
     
     //private methods
+    private void componentBtnActionPerformed(java.awt.event.ActionEvent evt, String card) {
+        componentCardLayout.show(componentFormPanel, card);
+        moddedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Modded "+card));
+        switch (card) {
+            case "Gear":
+                componentSaveBtn.setText(gearFormPanel.getEditMode() ? "Save" : "Edit");
+                break;
+            case "Weapon":
+                componentSaveBtn.setText(weaponFormPanel.getEditMode() ? "Save" : "Edit");
+                break;
+        }
+    }
+    
+    
     private void componentSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-        //this.gearFormPanel.onBtnSaveActioned();
-        this.weaponFormPanel.onBtnSaveActioned();
+        if (this.gearFormBtn.isSelected()) {
+            this.gearFormPanel.onBtnSaveActioned();
+        }else{
+            this.weaponFormPanel.onBtnSaveActioned();
+        }
     }    
     
+    private void componentNewBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        if (this.gearFormBtn.isSelected()) {
+            this.gearFormPanel.clearModdedGear();
+        } else {
+            this.weaponFormPanel.clearModdedWeapon();
+        }
+    }      
+    
     private void modSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
         this.modFormPanel.onBtnSaveActioned();
     }    
     
     private void modNewBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
         this.modFormPanel.clearMod();
-    }  
+    }      
     
-    private void componentNewBtnActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-        //this.gearFormPanel.clearModdedGear();
-        this.weaponFormPanel.clearModdedWeapon();
-    }  
     
     // Variables declaration - do not modify                     
     private ModFormGUI modFormPanel;
@@ -572,10 +627,15 @@ public class MainGUI extends javax.swing.JFrame {
     
     private FullBuildGUI defaultBuildTab;
     
+    private java.awt.CardLayout componentCardLayout;
+    private javax.swing.JPanel componentFormPanel;
     private GearFormGUI gearFormPanel;
     private WeaponFormGUI weaponFormPanel;
     
 
+    private javax.swing.ButtonGroup btnGroup;
+    private javax.swing.JRadioButton gearFormBtn;
+    private javax.swing.JRadioButton weaponFormBtn;
     
     // End of variables declaration                   
 }

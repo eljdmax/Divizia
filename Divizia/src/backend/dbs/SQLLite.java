@@ -1397,7 +1397,7 @@ public class SQLLite implements Persistable{
             weapon2 = fetchModdedWeapon(weaponTalents, Long.toString(rs.getLong("WEAPON_2_ID")));
             
             if (weapon2 !=null) {
-                fullBuild.setWeapon2(weapon1);
+                fullBuild.setWeapon2(weapon2);
             }
             
             ret.put(rs.getInt("rowid"), fullBuild );
@@ -1533,7 +1533,107 @@ public class SQLLite implements Persistable{
     }
     
     
+    private void deletePropValue(PropValue prop, Statement stmt) throws Exception{
+        if (prop.getId() == null){
+            return;
+        }
+        
+        String query = "DELETE FROM PROP_VALUE WHERE rowid = "+prop.getId();
+        
+        stmt.executeUpdate(query);
+    }
     
+    
+    @Override
+    public void deletePropValue(PropValue prop) {
+        
+        Connection c = null;
+        
+        try {
+            c = getConnection(); 
+            c.setAutoCommit(false);
+            
+            Statement stmt = c.createStatement();
+            
+            deletePropValue(prop, stmt);
+            
+            c.commit();
+            stmt.close();
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
+        } finally {
+            try {
+                if (c != null && !c.isClosed() ) { 
+                    c.close();
+                }
+            } catch (Exception ex) {
+                System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
+            }
+        }
+        
+        
+    }
+    
+    private void deleteMod(Mod mod, Statement stmt) throws Exception{
+        if (mod.getId() == null){
+            return;
+        }
+        
+        for (PropValue prop : mod.getBonus()){
+            deletePropValue(prop,stmt);
+        }
+        
+        String query = "DELETE FROM MOD_BONUSES WHERE MOD_ID = "+mod.getId();
+        
+        stmt.executeUpdate(query);
+        
+        query = "DELETE FROM MODS WHERE rowid = "+mod.getId();
+        
+        stmt.executeUpdate(query);
+        
+        query = "DELETE FROM MODDED_GEAR_MODS WHERE MOD_ID = "+mod.getId();
+        
+        stmt.executeUpdate(query);
+        
+        query = "DELETE FROM MODDED_WEAPON_MODS WHERE MOD_ID = "+mod.getId();
+        
+        stmt.executeUpdate(query);
+        
+    }
+    
+    @Override
+    public void deleteMod(Mod mod) {
+        
+        Connection c = null;
+        
+        try {
+            c = getConnection(); 
+            c.setAutoCommit(false);
+            
+            Statement stmt = c.createStatement();
+            
+            deleteMod(mod, stmt);
+            
+            c.commit();
+            stmt.close();
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
+        } finally {
+            try {
+                if (c != null && !c.isClosed() ) { 
+                    c.close();
+                }
+            } catch (Exception ex) {
+                System.err.println( ex.getClass().getName() + ": " + ex.getMessage() );
+            }
+        }
+        
+        
+    }
     
     
 }

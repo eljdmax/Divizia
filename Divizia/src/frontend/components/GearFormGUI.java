@@ -249,6 +249,10 @@ public class GearFormGUI extends javax.swing.JPanel {
         updateLayout();
     }
     
+    public boolean getEditMode() {
+        return editMode;
+    }
+    
     private void updateLayout() {
         //gearSetComboxBox;
         // gearScore

@@ -68,7 +68,7 @@ public class PropValue {
     
     @Override
     public String toString() {
-        return property.name()+ " // " + value + " // " + recalibrationPosition.name();
+        return property.name()+ " [" + value + "]" ;
     }
     
 }

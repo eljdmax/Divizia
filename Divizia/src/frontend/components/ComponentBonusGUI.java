@@ -6,14 +6,6 @@ import core.components.Property;
 import core.components.RecalibrationPosition;
 import core.utils.Constants;
 import frontend.main.MainGUI;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -69,7 +61,7 @@ public class ComponentBonusGUI extends javax.swing.JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (mod != null) {
-                        mainGUI.getModFormPanel().updateMod(mod);
+                        mainGUI.setSelectedModList(mod);
                     }
                 }
             });

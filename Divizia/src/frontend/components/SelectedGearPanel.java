@@ -32,7 +32,7 @@ public class SelectedGearPanel extends javax.swing.JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (parent.getModdedGear() != null) {
-                        parent.getMainGUI().getGearFormPanel().updateModdedGear(parent.getModdedGear(), parent.getGearType());
+                        parent.getMainGUI().getGearFormPanel(true).updateModdedGear(parent.getModdedGear(), parent.getGearType());
                     }
                 }
             });

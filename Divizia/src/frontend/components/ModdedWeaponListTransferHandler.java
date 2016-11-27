@@ -6,8 +6,8 @@
 
 package frontend.components;
 
+import core.build.ModdedWeapon;
 import core.components.Mod;
-import core.components.WeaponMod;
 import frontend.main.MainGUI;
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -19,25 +19,24 @@ import javax.swing.TransferHandler;
  *
  * @author tchabole
  */
-public class WeaponModListTransferHandler extends TransferHandler {
+public class ModdedWeaponListTransferHandler extends TransferHandler {
 
         @Override
         public boolean canImport(TransferHandler.TransferSupport support) {
-            
-            WeaponModGUI droppedPanel = getDroppedPanel(support);
-            if ( droppedPanel ==null ||  !support.isDataFlavorSupported(ModTransferable.MOD_DATA_FLAVOR) ) {
+            SelectedWeaponPanel droppedPanel = getDroppedPanel(support);
+            if ( droppedPanel ==null ||  !support.isDataFlavorSupported(ModdedWeaponTransferable.MODDEDWEAPON_DATA_FLAVOR) ) {
                 return false;
             }
             
-            return  droppedPanel.canReceiveMod(getImportedMod(support));
+            return  droppedPanel.canReceiveWeapon(getImportedWeapon(support));
         }
 
-        private WeaponMod getImportedMod(TransferHandler.TransferSupport support) {
+        private ModdedWeapon getImportedWeapon(TransferHandler.TransferSupport support) {
             try {
                 Transferable t = support.getTransferable();
-                Object value = t.getTransferData(ModTransferable.MOD_DATA_FLAVOR);
-                if (value instanceof WeaponMod) {
-                    return ((WeaponMod) value);
+                Object value = t.getTransferData(ModdedWeaponTransferable.MODDEDWEAPON_DATA_FLAVOR);
+                if (value instanceof ModdedWeapon) {
+                    return ((ModdedWeapon) value);
                 }
             } catch (Exception exp) {
                 exp.printStackTrace();
@@ -45,9 +44,9 @@ public class WeaponModListTransferHandler extends TransferHandler {
             return null;
         }
         
-        private WeaponModGUI getDroppedPanel(TransferHandler.TransferSupport support) {
-            if (support.getComponent() instanceof WeaponModGUI) {
-                return ((WeaponModGUI) support.getComponent());
+        private SelectedWeaponPanel getDroppedPanel(TransferHandler.TransferSupport support) {
+            if (support.getComponent() instanceof SelectedWeaponPanel) {
+                return ((SelectedWeaponPanel) support.getComponent());
             }
             return null;
         }
@@ -56,9 +55,11 @@ public class WeaponModListTransferHandler extends TransferHandler {
         public boolean importData(TransferHandler.TransferSupport support) {
             boolean accept = false;
             if (canImport(support)) {
-                WeaponModGUI droppedPanel = getDroppedPanel(support);
+                ModdedWeapon moddedWeapon = getImportedWeapon(support);
+                
+                SelectedWeaponPanel droppedPanel = getDroppedPanel(support);
                 if (droppedPanel != null) {
-                    droppedPanel.updateWeaponMod(getImportedMod(support));
+                    droppedPanel.getDisplayParent().updateModdedWeapon(moddedWeapon);
                     accept = true;
                 }
             }
@@ -73,12 +74,12 @@ public class WeaponModListTransferHandler extends TransferHandler {
         @Override
         protected Transferable createTransferable(JComponent c) {
             Transferable t = null;
-            if (c instanceof MainGUI.ModList) {
-                MainGUI.ModList list = (MainGUI.ModList) c;
+            if (c instanceof FullBuildGUI.WeaponList) {
+                FullBuildGUI.WeaponList list = (FullBuildGUI.WeaponList) c;
                 Object value = list.getSelectedValue();
-                if (value instanceof Mod) {
-                    Mod mod = (Mod) value;
-                    t = new ModTransferable(mod);
+                if (value instanceof ModdedWeapon) {
+                    ModdedWeapon moddedWeapon = (ModdedWeapon) value;
+                    t = new ModdedWeaponTransferable(moddedWeapon);
                 }
             }
             return t;

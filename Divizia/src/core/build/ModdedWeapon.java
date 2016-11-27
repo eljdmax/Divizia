@@ -146,7 +146,7 @@ public class ModdedWeapon {
     public String displayText() {
         String ret;
         
-        ret = "<html>" + weapon.toString() + "<br />"
+        ret = "<html>" + weapon.toString()
             + "</html>"; //+ talents
         
         return ret;

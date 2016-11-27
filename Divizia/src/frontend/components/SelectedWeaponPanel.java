@@ -6,7 +6,7 @@
 
 package frontend.components;
 
-import core.build.ModdedGear;
+import core.build.ModdedWeapon;
 import frontend.main.MainGUI;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -32,7 +32,7 @@ public class SelectedWeaponPanel extends javax.swing.JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (parent.getModdedWeapon() != null) {
-                        //parent.getMainGUI().getWeaponFormPanel().updateModdedWeapon(parent.getModdedWeapon());
+                        parent.getMainGUI().getWeaponFormPanel(true).updateModdedWeapon(parent.getModdedWeapon());
                     }
                 }
             });
@@ -65,20 +65,15 @@ public class SelectedWeaponPanel extends javax.swing.JPanel {
             }
         }
         
-        /*
-        public boolean canReceiveGear(ModdedGear moddedGear) {
-            if (moddedGear == null) {
+        
+        public boolean canReceiveWeapon(ModdedWeapon moddedWeapon) {
+            if (moddedWeapon == null) {
                 return false;
             }
-            try {
-                return Class.forName("core.components.gear."+this.parent.getGearType()).isInstance(moddedGear.getGear());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
             
-            return false;
+            return true;
         }
-        */
+        
         
         
         private javax.swing.JLabel weaponLabel;

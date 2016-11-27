@@ -34,10 +34,10 @@ public class WeaponDisplayGUI extends javax.swing.JPanel {
         javax.swing.border.TitledBorder titledBorder = javax.swing.BorderFactory.createTitledBorder(title);
         titledBorder.setTitleFont( MainGUI.DEFAULT_FONT_BOLD );
         this.setBorder(titledBorder);
-        this.setLayout(new java.awt.GridLayout(0, 2));
+        this.setLayout(new java.awt.BorderLayout());
 
         
-        //selectedWeaponPanel.setTransferHandler(new ModdedWeaponListTransferHandler());
+        selectedWeaponPanel.setTransferHandler(new ModdedWeaponListTransferHandler());
         this.add(selectedWeaponPanel,java.awt.BorderLayout.CENTER);
 
 
@@ -60,7 +60,7 @@ public class WeaponDisplayGUI extends javax.swing.JPanel {
     }
 
 
-    public void updateModdedGear(ModdedWeapon moddedWeapon) {
+    public void updateModdedWeapon(ModdedWeapon moddedWeapon) {
         this.moddedWeapon = moddedWeapon;
         this.selectedWeaponPanel.refresh();
     }

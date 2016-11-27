@@ -1,15 +1,9 @@
 package frontend.components;
 
 import backend.Persistable;
-import core.build.ModdedGear;
 import core.build.ModdedWeapon;
-import core.components.Gear;
-import core.components.GearMod;
-import core.components.GearSet;
-import core.components.Mod;
 import core.components.ModType;
 import core.components.PropValue;
-import core.components.Property;
 import core.components.RecalibrationPosition;
 import core.components.Weapon;
 import core.components.WeaponMod;
@@ -17,9 +11,7 @@ import core.components.WeaponTalent;
 import core.components.WeaponType;
 import core.utils.Constants;
 import frontend.main.MainGUI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -145,7 +137,7 @@ public class WeaponFormGUI extends javax.swing.JPanel {
         for ( ModType modType : mainGUI.getModFamiliesList(Constants.WEAPON_MOD)) {
 
             modPanel = new WeaponModGUI(mainGUI, modType);
-            modPanel.setTransferHandler(new ModListTransferHandler());
+            modPanel.setTransferHandler(new WeaponModListTransferHandler());
             modPanel.setPreferredSize(new java.awt.Dimension(30, 30));
             modsMapPanel.put(modType,modPanel);
             modsPanel.add(modPanel);
@@ -233,6 +225,10 @@ public class WeaponFormGUI extends javax.swing.JPanel {
         }
     }
     
+    public boolean getEditMode() {
+        return editMode;
+    }
+    
     private void setEditable(boolean editMode) {
         this.editMode = editMode;
         updateLayout();
@@ -280,6 +276,7 @@ public class WeaponFormGUI extends javax.swing.JPanel {
                 i++;
             }
             
+            bonusText.setText("");
             if (moddedWeapon.getWeapon().getWeaponBonus() != null) {
                 bonusText.setText(moddedWeapon.getWeapon().getWeaponBonus().getValue().toString());
             }

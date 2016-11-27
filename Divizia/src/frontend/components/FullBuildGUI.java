@@ -13,6 +13,7 @@ import frontend.main.MainGUI;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -78,8 +79,8 @@ public class FullBuildGUI extends javax.swing.JPanel {
         row4Panel.add(weapon2);
         
         weaponList.setFont(MainGUI.DEFAULT_FONT);
-        //weaponList.setDragEnabled(true);
-        //weaponList.setTransferHandler(new ModdedWeaponListTransferHandler());
+        weaponList.setDragEnabled(true);
+        weaponList.setTransferHandler(new ModdedWeaponListTransferHandler());
         
         scrollPane.setViewportView(weaponList);
 
@@ -196,6 +197,9 @@ public class FullBuildGUI extends javax.swing.JPanel {
         fullBuild.updateKneepads(kneepadsPanel.getModdedGear());
         fullBuild.updateMask(maskPanel.getModdedGear());
         
+        fullBuild.setWeapon1(weapon1.getModdedWeapon());
+        fullBuild.setWeapon2(weapon2.getModdedWeapon());
+        
         //Weapons
         
         backend.saveOrUpdateFullBuild(fullBuild);
@@ -234,6 +238,14 @@ public class FullBuildGUI extends javax.swing.JPanel {
             
             setModel(getWeaponListModel());
             
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            getSelectionModel().addListSelectionListener(new SharedListSelectionHandler(this) {
+                public void onValueChanged(Object object){
+                    mainGUI.getWeaponFormPanel(true).updateModdedWeapon((ModdedWeapon) object);
+                }
+            });
+            
             addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -247,10 +259,11 @@ public class FullBuildGUI extends javax.swing.JPanel {
                     
                     if (index >= 0) {
                         ModdedWeapon theModdedWeapon= (ModdedWeapon) theList.getModel().getElementAt(index);
-                        mainGUI.getWeaponFormPanel().updateModdedWeapon(theModdedWeapon);
+                        mainGUI.getWeaponFormPanel(true).updateModdedWeapon(theModdedWeapon);
                     }
                 }
             });
+            
         }
     }
     

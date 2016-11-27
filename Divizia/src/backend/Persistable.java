@@ -35,6 +35,7 @@ public interface Persistable {
     public void saveOrUpdateModdedWeapon(ModdedWeapon moddedWeapon);
     public void saveOrUpdateFullBuild(FullBuild fullBuild);
     
-    //TODO: Delete interface
+    public void deletePropValue(PropValue prop);
+    public void deleteMod(Mod mod);
     
 }

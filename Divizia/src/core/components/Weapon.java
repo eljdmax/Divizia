@@ -136,6 +136,23 @@ public class Weapon {
     
     @Override
     public String toString() {
+        String ret = Integer.toString(gearScore) + " "+weaponType.name() + " " + baseDamage.toString()+ "<br />"; ;
+        if (weaponBonus != null){
+            ret += weaponBonus.toString() + "<br />";
+        }
+        
+        for (WeaponTalent wt : extraTalents) {
+            ret += wt.toString() + "<br />";
+        }
+        
+        if (mainTalent != null){
+            ret +=  mainTalent.toString();
+        }
+
+        return ret;
+    }
+    
+    public String printAllDetails() {
         String ret = weaponType.name() + " " + baseDamage.toString() ;
         if (weaponBonus != null){
             ret += "\n\tBonus: " + weaponBonus.toString();

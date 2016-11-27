@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -95,6 +96,14 @@ public class GearDisplayGUI extends javax.swing.JPanel {
             
             setModel(getGearListModel());
             
+            setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            getSelectionModel().addListSelectionListener(new SharedListSelectionHandler(this) {
+                public void onValueChanged(Object object){
+                    mainGUI.getGearFormPanel(true).updateModdedGear((ModdedGear) object, gearType);
+                }
+            });
+            
             addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -108,7 +117,7 @@ public class GearDisplayGUI extends javax.swing.JPanel {
                     
                     if (index >= 0) {
                         ModdedGear theModdedGear = (ModdedGear) theList.getModel().getElementAt(index);
-                        mainGUI.getGearFormPanel().updateModdedGear(theModdedGear, gearType);
+                        mainGUI.getGearFormPanel(true).updateModdedGear(theModdedGear, gearType);
                     }
                 }
             });
